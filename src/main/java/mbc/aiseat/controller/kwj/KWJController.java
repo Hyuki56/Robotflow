@@ -8,7 +8,7 @@ public class KWJController {
 
     @GetMapping("/KWJ")
     public String test() {
-        return "tesKWJ/t";
+        return "KWJ/test";
     }
 
 }

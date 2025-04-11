@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="stylesheet" href="/static/pce/css/swiper.min.css">
-    <link rel="stylesheet" href="/static/pce/css/common.css" />
-    <script type="text/javascript" src="/static/pce/js/swiper.min.js"></script>
-    <script src="/static/pce/js/jquery-3.7.1.min.js"></script>
-    <script src="/static/pce/js/rollmain.js"></script>
-    <script src="/static/pce/js/common.js"></script>
-    <script src="/static/pce/js/jquery.smooth-scroll.min.js"></script>
+    <link rel="stylesheet" href="/pce/css/swiper.min.css">
+    <link rel="stylesheet" href="/pce/css/common.css" />
+    <script type="text/javascript" src="/pce/js/swiper.min.js"></script>
+    <script src="/pce/js/jquery-3.7.1.min.js"></script>
+    <script src="/pce/js/rollmain.js"></script>
+    <script src="/pce/js/common.js"></script>
+    <script src="/pce/js/jquery.smooth-scroll.min.js"></script>
     <!--[if lte IE 9]>
-        <script src="/static/pce/js/html5shiv.js"></script>
-        <script src="/static/pce/js/placeholders.min.js"></script>
+        <script src="/pce/js/html5shiv.js"></script>
+        <script src="/pce/js/placeholders.min.js"></script>
     <![endif]-->
 </head>
 <body>
@@ -35,21 +35,24 @@
         <!-- header_cont -->
         <div class="header_cont">
             <ul class="util clear">
-                <li><a href="pce/login.html">로그인</a></li>
-                <li><a href="pce/signup.html">회원가입</a></li>
+                <li><a href="login">로그인</a></li>
+                <li><a href="signup">회원가입</a></li>
             </ul>
             <nav>
                 <ul class="gnb clear">
-                    <li><a href="Javascript:;" class="openAll1">실시간 CCTV</a>
+                    <li><a href="/frontlive" class="openAll1">front 라이브 송출 확인</a>
                         <div class="gnb_depth gnb_depth2_1"></div>
                     </li>
-                    <li><a href="hyuk/test.html" class="openAll2">CH</a> <!--최혁-->
+                    <li><a href="/backlive" class="openAll1">back 라이브 송출 확인</a>
+                        <div class="gnb_depth gnb_depth2_1"></div>
+                    </li>
+                    <li><a href="/" class="openAll2">CH</a> <!--최혁-->
                         <div class="gnb_depth gnb_depth2_2"></div>
                     </li>
-                    <li><a href="KWJ/test.html" class="openAll3">KWJ</a> <!--김원준-->
+                    <li><a href="KWJ" class="openAll3">KWJ</a> <!--김원준-->
                         <div class="gnb_depth gnb_depth2_3"></div>
                     </li>
-                    <li><a href="pgw/test.html" class="openAll4">PGW</a> <!--표관우-->
+                    <li><a href="/" class="openAll4">PGW</a> <!--표관우-->
                         <div class="gnb_depth gnb_depth2_4"></div>
                     </li>
                 </ul>
@@ -61,7 +64,7 @@
     </header>
     <div id="container">
     </div>
-    <script type="text/javascript" src="/static/pce/js/swiper.min.js"></script>
+    <script type="text/javascript" src="/pce/js/swiper.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function(){
             var swiper = new Swiper('.swiper-container', {
