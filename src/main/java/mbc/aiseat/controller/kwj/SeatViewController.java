@@ -25,7 +25,7 @@ public class SeatViewController {
 
         List<Seat> seats = seatService.getReservedSeats(); // 전체 좌석 정보
         model.addAttribute("seats", seats);
-        return "info";
+        return "KWJ/info";
     }
 
     @PostMapping("/info")
