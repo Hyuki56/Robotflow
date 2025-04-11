@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>예약 정보</title>
+</head>
+<body>
+<h1>예약 좌석 목록</h1>
+<a href = "/">home</a>
+<table border="1">
+  <thead>
+  <tr>
+    <th>좌석 이름</th>
+    <th>예약자</th>
+    <th>예약 시간</th>
+    <th>승인됨</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="seat : ${seats}">
+    <td th:text="${seat.seatName}">좌석이름</td>
+    <td th:text="${seat.reservedBy}">예약자</td>
+    <td th:text="${#temporals.format(seat.reservedAt, 'yyyy-MM-dd HH:mm')}">예약시간</td>
+    <td>
+      <span th:text="${seat.approved ? '승인됨' : '대기중'}"></span>
+      <button
+              th:if="!${seat.approved}"
+              th:attr="data-seat-name=${seat.seatName}"
+              onclick="approveSeat(this)">
+        승인
+      </button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<script>
+  function approveSeat(button) {
+    const seatName = button.getAttribute('data-seat-name');
+
+    fetch(`/info`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({ seatName })
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("승인 실패");
+              return res.json();
+            })
+            .then(data => {
+              alert("승인 완료!");
+              location.reload();
+            })
+            .catch(err => {
+              alert("승인 중 오류 발생: " + err.message);
+            });
+  }
+</script>
+
+
+</body>
+</html>

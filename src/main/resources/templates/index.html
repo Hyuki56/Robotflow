@@ -1,16 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
 <a href="/">홈페이지</a>
-<a href="/">실시간 CCTV</a>
+<a href="/frontlive">front 라이브 송출 확인<a>
+<a href="/backlive">back 라이브 송출 확인<a>
 <a href="/">CH</a> <!--최혁-->
 <a href="/KWJ">KWJ</a> <!--김원준-->
-<a href="/">PGW</a> <!--표관우-->
-<a href="/login">로그인</a>
+<a href="/">PGW</a> <!--표관우--> <br>
+    <div class="navbar-text me-5" sec:authorize="isAuthenticated()">
+        <span th:text=" ${#authentication.principal.username} + '님 환영합니다.'"></span>
+    </div>
+
+    <!-- 로그인하지 않은 사용자에게만 로그인/회원가입 표시 -->
+    <div class="navbar-text me-5" sec:authorize="isAnonymous()">
+        <a href="/login">로그인</a>
+    </div>
+
+    <!-- 로그인한 사용자에게만 환영 메시지 및 로그아웃 표시 -->
+    <div class="navbar-text me-5" sec:authorize="isAuthenticated()">
+        <a href="/logout">로그아웃</a>
+    </div>
+
 <a href="/signup">회원가입</a>
 </body>
 </html>
