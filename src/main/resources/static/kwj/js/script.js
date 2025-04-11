@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('페이지 로드 완료!');
 
-    fetch('/kwj/json/data.json')
+    fetch('/json/data.json')
         .then(response => response.json())
         .then(data => {
             console.log('JSON 내용:', data);
