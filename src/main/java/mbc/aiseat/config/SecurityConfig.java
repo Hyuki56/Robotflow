@@ -1,5 +1,6 @@
 package mbc.aiseat.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 @Log4j2
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,14 +32,17 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         .defaultSuccessUrl("/")
-                        .usernameParameter("name")
+                        .usernameParameter("email")
                         .failureUrl("/login/error")
                 )
-//                .oauth2Login(oauth2->oauth2
-//                        .loginPage("/login")
-//                        .defaultSuccessUrl("/")
-//                        .failureUrl("/login/error")
-//                )
+                .oauth2Login(oauth2->oauth2
+                        .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)  // 이 줄 중요!
+                        )
+                        .defaultSuccessUrl("/oauth-success")
+                        .failureUrl("/login/error")
+                )
 
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))

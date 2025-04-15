@@ -6,44 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="stylesheet" href="/pce/css/swiper.min.css">
-    <link rel="stylesheet" href="/pce/css/common.css" />
-    <script type="text/javascript" src="/pce/js/swiper.min.js"></script>
-    <script src="/pce/js/jquery-3.7.1.min.js"></script>
-    <script src="/pce/js/rollmain.js"></script>
-    <script src="/pce/js/common.js"></script>
-    <script src="/pce/js/jquery.smooth-scroll.min.js"></script>
-    <!--[if lte IE 9]>
-        <script src="/pce/js/html5shiv.js"></script>
-        <script src="/pce/js/placeholders.min.js"></script>
-    <![endif]-->
+
 </head>
 <body>
-
-<ul class="skipnavi">
-    <li><a href="#container">본문내용</a></li>
-</ul>
 <!-- wrap -->
 <div id="wrap">
 
 <header id="header">
+    <div class="social-buttons" sec:authorize="isAnonymous()">
+        <h2>소셜 계정 로그인</h2>
+        <button type="button" onclick="openOAuthPopup('/oauth2/authorization/google')">구글 로그인</button>
+        <button type="button" onclick="openOAuthPopup('/oauth2/authorization/naver')">네이버 로그인</button>
+        <button type="button" onclick="openOAuthPopup('/oauth2/authorization/kakao')">카카오 로그인</button>
+    </div>
     <div class="header_area box_inner clear">
         <h1><a href="Javascript:;">홈페이지</a></h1>
-        <p class="openMOgnb">
-            <a href="#"><b class="hdd">메뉴열기</b><span></span><span></span><span></span></a>
-        </p>
+
+        <div class="navbar-text me-5" sec:authorize="isAuthenticated()">
+            <span th:text=" ${#authentication.principal.name} + '님 환영합니다.'"></span>
+        </div>
+
         <!-- header_cont -->
         <div class="header_cont">
             <ul class="util clear">
-                <li><a href="login">로그인</a></li>
-                <li><a href="signup">회원가입</a></li>
+                <li sec:authorize="isAnonymous()"><a href="/login">로그인</a></li>
+                <li sec:authorize="isAuthenticated()"><a href="/logout">로그아웃</a></li>
+                <li sec:authorize="isAuthenticated()"><a href="/edit">회원정보수정/탈퇴</a></li>
+                <li  sec:authorize="isAnonymous()"><a href="/signup">회원가입</a></li>
             </ul>
             <nav>
                 <ul class="gnb clear">
-                    <li><a href="/frontlive" class="openAll1">front 라이브 송출 확인</a>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')"><a href="/frontlive" class="openAll1">front 라이브 송출 확인</a>
                         <div class="gnb_depth gnb_depth2_1"></div>
                     </li>
-                    <li><a href="/backlive" class="openAll1">back 라이브 송출 확인</a>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')"><a href="/backlive" class="openAll1">back 라이브 송출 확인</a>
                         <div class="gnb_depth gnb_depth2_1"></div>
                     </li>
                     <li><a href="/hyuk_index" class="openAll2">CH</a> <!--최혁-->
@@ -57,26 +53,25 @@
                     </li>
                 </ul>
             </nav>
-                <p class="closePop"><a href="Javascript:;">닫기</a></p>
+
             </div>
             <!-- //header_cont -->
         </div>
     </header>
-    <div id="container">
-    </div>
-    <script type="text/javascript" src="/pce/js/swiper.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            var swiper = new Swiper('.swiper-container', {
-                loop: true,
-                autoplay: 5500,
-                autoplayDisableOnInteraction: false,
-                pagination: '.swiper-pagination',
-                paginationClickable: true
-            });
-        });
-    </script>
+
 </div>
+
+<script>
+    function openOAuthPopup(url) {
+        const width = 600;
+        const height = 700;
+        const left = (screen.width - width) / 2;
+        const top = (screen.height - height) / 2;
+
+        window.open(url, 'OAuthPopup', `width=${width},height=${height},top=${top},left=${left}`);
+    }
+</script>
+
 
 </body>
 </html>
