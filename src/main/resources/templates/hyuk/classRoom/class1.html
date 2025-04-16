@@ -13,15 +13,15 @@
 
   <script>
     async function fetchSeatStatus() {
-      const res = await fetch('../seats_status.json');
+      const res = await fetch('/api/class1/seats');
       const data = await res.json();
-      return data.class1;
+      return data;
     }
 
     async function renderSeats() {
       const seatData = await fetchSeatStatus();
       const grid = document.getElementById('seatGrid');
-      grid.innerHTML = ''; // 초기화
+      grid.innerHTML = ''; // 좌석 초기화
 
       const seatOrder = [
         "a1", "a2", "a3", "a4",
@@ -31,7 +31,9 @@
 
       seatOrder.forEach(seatId => {
         const seatDiv = document.createElement('div');
-        seatDiv.className = `seat ${seatData[seatId]}`;
+        const status = seatData[seatId] || "null"; // 혹시 null이면 기본값
+
+        seatDiv.className = `seat ${status}`; // used 또는 null 클래스 부여
         seatDiv.textContent = seatId.toUpperCase();
         grid.appendChild(seatDiv);
       });
@@ -46,8 +48,10 @@
       }
     }
 
+    // 페이지 로드시 실행
     renderSeats();
-    setInterval(renderSeats, 10000); // 10초마다 갱신
+    setInterval(renderSeats, 10000); // 10초마다 업데이트
   </script>
+
 </body>
 </html>
