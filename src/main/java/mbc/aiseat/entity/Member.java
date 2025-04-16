@@ -19,7 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member implements UserDetails {
+public class Member extends BaseTimeEntity {
 
     @Id
     @Column(name = "member_id")
@@ -27,6 +27,7 @@ public class Member implements UserDetails {
     private Long id;
 
     private String name;
+    @Column(unique = true)
     private String email;
     private String password;
     private String phone;
@@ -37,43 +38,8 @@ public class Member implements UserDetails {
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-    public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
-
-        Member member = new Member();
-
-        member.setName(memberFormDto.getName());
-        member.setEmail(memberFormDto.getEmail());
-        String password = passwordEncoder.encode(memberFormDto.getPassword());
-        member.setPassword(password);
-        member.setPhone(memberFormDto.getPhone());
-        member.setRole(Role.USER);
-        member.setStatus(MemberStatus.ACTIVE);
-
-        return member;
-    }
-
-    // UserDetails 필수 메서드 구현
-    @Override
-    public String getUsername() {
-        return name;  // 또는 email 등 원하는 로그인 ID 반환
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    // 나머지 메서드는 기본값으로 둬도 괜찮습니다.
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
-
-
+    private String provider; // ex) google, kakao
+    @Column(unique = true)
+    private String providerId; // ex) 구글에서 받은 식별자
 
 }

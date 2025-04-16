@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>연동 완료</title>
+</head>
+<body>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const fromEdit = sessionStorage.getItem("fromEdit");
+  if (fromEdit) {
+    window.opener.location.reload();
+  } else {
+    window.opener.location.href = "/";
+  }
+  window.close()
+  /*]]>*/
+</script>
+</body>
+</html>
