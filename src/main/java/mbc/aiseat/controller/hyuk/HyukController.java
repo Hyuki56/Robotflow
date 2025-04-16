@@ -9,14 +9,16 @@ public class HyukController {
 
     @GetMapping("/hyuk_index")
     public String hyukIndex() {
-        return "hyuk/hyuk_index";  // templates/hyuk/hyuk_index.html 경로를 의미
+        return "hyuk/hyuk_index";  /// templates/hyuk/hyuk_index.html 경로를 의미
     }
 
-    // 클래스 경로가 /hyuk/classRoom/class1.html 형식으로 올 거니까
     @GetMapping("/classRoom/class{num}.html")
     public String classPage(@PathVariable String num) {
-        return "hyuk/classRoom/class" + num;
+        return "hyuk/classRoom/class" + num;  // 경로: templates/hyuk/classRoom/class1.html
     }
 
-
+    @GetMapping("/hyuk_reservations")
+    public String showReservations() {
+        return "hyuk/hyuk_reservations";  // 예약 페이지 보여주기
+    }
 }

@@ -3,30 +3,29 @@ server:
 
 spring:
   application:
-    name: www
+    name: reservation-system # 프로젝트 명칭 수정
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/shop?serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/library?serverTimezone=Asia/Seoul
     username: test
     password: 1234
 
   jpa:
     hibernate:
-      ddl-auto: update #??? ??
+      ddl-auto: update  # 데이터베이스 테이블 자동 생성/업데이트 옵션, 개발 중에는 'update', 프로덕션에서는 'none'을 추천
     properties:
       hibernate:
-        show_sql: true # SQL ??? ??? ??
-        format_sql: true # SQL ??? ??? ?? ??
-        default_batch_fetch_size: 100
-    database-platform: org.hibernate.dialect.MySQL8Dialect #SQL ??(dialect)? ????, ? ??????? ???? ??? ?? ??
+        show_sql: true  # SQL 쿼리 출력 여부
+        format_sql: true  # SQL 쿼리 형식화 여부 (읽기 쉬운 형태로 출력)
+        default_batch_fetch_size: 100  # 배치 처리 시 한 번에 가져올 레코드 개수
+    database-platform: org.hibernate.dialect.MySQL8Dialect # MySQL 8 dialect 사용
 
   servlet:
     multipart:
       enabled: true
-      max-file-size: 20MB  # ?? ?? ?? ??
-      max-request-size: 100MB  # ?? ?? ?? ??
-
+      max-file-size: 20MB  # 업로드 가능한 파일 최대 크기
+      max-request-size: 100MB  # 최대 요청 크기
 
 logging:
   level:
@@ -34,5 +33,4 @@ logging:
       hibernate:
         type:
           descriptor:
-            sql: trace
-#    root: debug # ??? ?? ???
+            sql: trace  # Hibernate SQL 쿼리 출력 레벨 설정
