@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class SeatDto {
     private String seatName;
+    private String reservedBy;
 }

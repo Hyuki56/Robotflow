@@ -9,8 +9,8 @@ import java.util.Optional;
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     boolean existsBySeatName(String seatName);
     Seat findByseatName(String seatName);
-    List<Seat> findByReservedTrue(); // reserved 가 true 인 데이터만
     List<Seat> findAll();
     Optional<Seat> findBySeatName(String seatName);
+    Seat findByReservedBy(String reservedBy);
 
 }
