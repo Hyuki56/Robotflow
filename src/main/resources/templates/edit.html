@@ -70,18 +70,18 @@
         });
     });
 
-    // 팝업 띄우기 전에 세션 스토리지에 저장
-    if (window.location.pathname.includes("/edit")) {
-        sessionStorage.setItem("fromEdit", "true");
-    }
-
     function openOAuthPopup(url) {
+        // 세션스토리지에 설정
+        sessionStorage.setItem("fromEdit", window.location.pathname.includes("/edit") ? "true" : "false");
+
         const width = 600;
         const height = 700;
         const left = (screen.width - width) / 2;
         const top = (screen.height - height) / 2;
 
         window.open(url, 'OAuthPopup', `width=${width},height=${height},top=${top},left=${left}`);
+
+        sessionStorage.removeItem("fromEdit"); // 사용 후 삭제
     }
 </script>
 

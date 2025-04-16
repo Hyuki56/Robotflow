@@ -39,6 +39,7 @@ public class Member extends BaseTimeEntity {
     private MemberStatus status;
 
     private String provider; // ex) google, kakao
+    @Column(unique = true)
     private String providerId; // ex) 구글에서 받은 식별자
 
 }

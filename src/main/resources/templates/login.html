@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -27,6 +27,24 @@
 <!--    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">-->
 
 </form>
+
+<div class="social-buttons" sec:authorize="isAnonymous()">
+    <h2>소셜 계정 로그인</h2>
+    <button type="button" onclick="openOAuthPopup('/oauth2/authorization/google')">구글 로그인</button>
+    <button type="button" onclick="openOAuthPopup('/oauth2/authorization/naver')">네이버 로그인</button>
+    <button type="button" onclick="openOAuthPopup('/oauth2/authorization/kakao')">카카오 로그인</button>
+</div>
+
+<script>
+    function openOAuthPopup(url) {
+        const width = 600;
+        const height = 700;
+        const left = (screen.width - width) / 2;
+        const top = (screen.height - height) / 2;
+
+        window.open(url, 'OAuthPopup', `width=${width},height=${height},top=${top},left=${left}`);
+    }
+</script>
 
 </body>
 </html>

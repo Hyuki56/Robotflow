@@ -7,15 +7,13 @@
 <body>
 <script th:inline="javascript">
   /*<![CDATA[*/
-  const fromEdit = sessionStorage.getItem("fromEdit") === "true";
-  sessionStorage.removeItem("fromEdit"); // 사용 후 삭제
-
+  const fromEdit = sessionStorage.getItem("fromEdit");
   if (fromEdit) {
     window.opener.location.reload();
   } else {
     window.opener.location.href = "/";
   }
-  window.close();
+  window.close()
   /*]]>*/
 </script>
 </body>

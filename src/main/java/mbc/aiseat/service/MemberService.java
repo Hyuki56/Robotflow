@@ -102,7 +102,4 @@ public class MemberService {
         }
     }
 
-    public void unlink(String provider, Long memberId) {
-    }
-
 }

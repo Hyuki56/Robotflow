@@ -87,6 +87,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             // 로그인된 상태에서 소셜 연동
             member = memberRepository.findByEmail(userDetails.getUsername());
             if (member != null) {
+                // providerId가 다른 사용자에게 연결되어 있는지 확인
+                Member existingLinkedMember = memberRepository.findByProviderId(providerId);
+                if (existingLinkedMember != null && !existingLinkedMember.getEmail().equals(member.getEmail())) {
+                    // 다른 계정에 이미 연결된 소셜 계정 → 연동 거부
+                    log.warn("연동 실패: 이미 다른 계정에 연동된 소셜 계정입니다. providerId={}, email={}", providerId, existingLinkedMember.getEmail());
+                    throw new OAuth2AuthenticationException("이미 다른 계정에 연동된 소셜 계정입니다.");
+                }
+
                 member.setProvider(registrationId);
                 member.setProviderId(providerId);
                 memberRepository.save(member);

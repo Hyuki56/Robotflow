@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-public class SeatViewController {
+public class SeatReservationInfoController {
 
     private final SeatService seatService;
 
