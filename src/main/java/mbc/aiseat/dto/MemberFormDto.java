@@ -33,6 +33,9 @@ public class MemberFormDto {
     @AssertTrue(message = "이메일 인증을 완료해주세요.")
     private Boolean emailVerified;
 
+    @NotNull(message = "전화번호 인증이 필요합니다.")
+    @AssertTrue(message = "전화번호 인증을 완료해주세요.")
+    private Boolean phoneVerified;
 
     // Member 객체를 기반으로 DTO 초기화
     public MemberFormDto(Member member) {

@@ -60,9 +60,24 @@
   <!-- 전화번호 입력 -->
   <div class="form-group mb-3">
     <label th:for="phone">전화번호</label>
-    <input type="text" th:field="*{phone}" class="form-control" placeholder="전화번호를 입력해주세요">
+    <input type="text" th:field="*{phone}" id="phone" class="form-control" placeholder="전화번호를 입력해주세요">
+    <button id="phoneSendBtn">전화 인증번호 전송</button>
+    <button id="phoneCheckBtn" style="display:none;">전화 인증번호 확인</button> <!-- 인증 확인 버튼은 기본적으로 숨김 -->
     <p th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error">Incorrect data</p>
   </div>
+
+  <!-- 인증번호 입력 -->
+  <div class="form-group mb-3" id="phoneVerifySection" style="display:none;">
+    <label for="verificationCode">인증번호 입력</label>
+    <input type="text" id="phoneVerificationCode" class="form-control" placeholder="인증번호를 입력해주세요">
+    <button type="button" class="btn btn-outline-success mt-2" id="phoneVerifyCodeBtn">인증 확인</button>
+    <p id="phoneVerifyResult" class="mt-1"></p>
+  </div>
+
+  <!-- 이메일 인증 여부 (기본 false) -->
+  <input type="hidden" th:field="*{phoneVerified}" id="phoneVerified" value="false" />
+  <p th:if="${#fields.hasErrors('phoneVerified')}" th:errors="*{phoneVerified}" class="error"></p>
+
 
   <!-- 회원 가입 버튼 -->
   <div>
@@ -167,6 +182,104 @@
     alert(errorMessage);
   }
   /*]]>*/
+</script>
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+  import {
+    getAuth,
+    signInWithPhoneNumber,
+    RecaptchaVerifier
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBGGeZcBYfNXX6GX1WsWQW2mpDBmMcgSBA",
+    authDomain: "aiseat-878b1.firebaseapp.com",
+    projectId: "aiseat-878b1",
+    storageBucket: "aiseat-878b1.firebasestorage.app",
+    messagingSenderId: "1028393632493",
+    appId: "1:1028393632493:web:7e9368b06d34ef0038c2e4",
+    measurementId: "G-FHS9S7L3X3"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth();
+  auth.languageCode = 'ko';
+
+
+  window.recaptchaVerifier = new RecaptchaVerifier(auth, 'phoneSendBtn', {
+    'size': 'invisible',
+    'callback': (response) => {
+      console.log('reCAPTCHA solved:', response);
+      // reCAPTCHA solved, allow signInWithPhoneNumber.
+      // onSignInSubmit(); // 정의안되어있는데?
+    }
+  });
+
+  document.getElementById('phoneSendBtn').addEventListener('click', (event) => {
+    event.preventDefault();
+    const phoneNumber = document.getElementById('phone').value;
+
+    if (!phoneNumber) {
+      alert('전화번호를 입력해주세요.');
+      return;
+    }
+
+    const appVerifier = window.recaptchaVerifier;
+
+    // 전화번호 인증 발송
+    signInWithPhoneNumber(auth, '+82' + phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+              window.confirmationResult = confirmationResult;
+              console.log(confirmationResult);
+
+              // 인증번호 입력 칸과 인증 확인 버튼을 표시
+              document.getElementById('phoneVerifySection').style.display = 'block';
+              document.getElementById('phoneVerifyCodeBtn').style.display = 'inline-block'; // 인증 확인 버튼을 보이게 설정
+
+              // 인증 확인 버튼 클릭 이벤트 추가
+              document.getElementById('phoneVerifyCodeBtn').addEventListener('click', () => {
+                const code = document.getElementById('phoneVerificationCode').value;
+                const phoneNumber = document.getElementById('phone').value;
+
+                // 인증 코드 입력이 없을 경우
+                if (!code) {
+                  $('#phoneVerifyResult').text('인증번호를 입력해주세요.').css('color', 'red');
+                  return;
+                }
+
+                confirmationResult.confirm(code)
+                        .then((result) => {
+                          const user = result.user;
+                          $('#phoneVerifyResult').text('전화번호 인증이 완료되었습니다.').css('color', 'green');
+
+                          // 전화번호 인증 여부를 hidden input에 설정
+                          $('#phoneVerified').val('true'); // 값만 true로 변경
+
+                          // 추가적인 동작을 여기에 추가
+                        })
+                        .catch((error) => {
+                          console.error('인증 실패:', error.message);
+                          $('#phoneVerifyResult').text('인증 실패! 다시 시도해주세요.').css('color', 'red');
+                          $('#phoneVerified').val('false'); // 인증 실패시 false로 설정
+                        });
+              });
+            })
+            .catch((error) => {
+              console.error('전화번호 인증 실패:', error.message, error.code);
+              alert('인증번호 발송에 실패했습니다.');
+            });
+  });
+
+
+
 </script>
 
 
