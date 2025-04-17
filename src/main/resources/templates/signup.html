@@ -28,11 +28,27 @@
   <!-- 이메일 입력 -->
   <div class="form-group mb-3">
     <label th:for="email">이메일주소</label>
-    <input type="email" th:field="*{email}" class="form-control" placeholder="이메일을 입력해주세요">
-    <button type="button" class="btn btn-outline-secondary" id="checkEmailBtn">중복 확인</button>
-    <p id="checkResult" class="mt-1"></p> <!-- 결과 메시지 표시 -->
+    <div class="input-group">
+      <input type="email" th:field="*{email}" id="email" class="form-control" placeholder="이메일을 입력해주세요">
+      <button type="button" class="btn btn-outline-secondary" id="checkEmailBtn">중복 확인</button>
+      <button type="button" class="btn btn-outline-primary" id="sendCodeBtn">인증 요청</button>
+    </div>
+    <p id="checkResult" class="mt-1"></p>
     <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error">Incorrect data</p>
   </div>
+
+  <!-- 인증번호 입력 -->
+  <div class="form-group mb-3" id="verifySection" style="display:none;">
+    <label for="verificationCode">인증번호 입력</label>
+    <input type="text" id="verificationCode" class="form-control" placeholder="인증번호를 입력해주세요">
+    <button type="button" class="btn btn-outline-success mt-2" id="verifyCodeBtn">인증 확인</button>
+    <p id="verifyResult" class="mt-1"></p>
+  </div>
+
+  <!-- 이메일 인증 여부 (기본 false) -->
+  <input type="hidden" th:field="*{emailVerified}" id="emailVerified" value="false" />
+  <p th:if="${#fields.hasErrors('emailVerified')}" th:errors="*{emailVerified}" class="error"></p>
+
 
   <!-- 비밀번호 입력 -->
   <div class="form-group mb-3">
@@ -49,7 +65,7 @@
   </div>
 
   <!-- 회원 가입 버튼 -->
-  <div style="text-align: center">
+  <div>
     <button type="submit" class="btn btn-success">회원 가입</button>
   </div>
 
@@ -86,6 +102,61 @@
         }
       });
     });
+
+    // 인증 요청 버튼 클릭 시
+    $('#sendCodeBtn').click(function() {
+      const email = $('#email').val();
+      if (!email) {
+        alert('이메일을 입력해주세요.');
+        return;
+      }
+
+      $.ajax({
+        url: '/send-verification-code',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ email: email }),
+        success: function(response) {
+          alert('인증번호가 이메일로 전송되었습니다.');
+          $('#verifySection').show(); // 인증번호 입력창 표시
+        },
+        error: function() {
+          alert('인증번호 전송 중 오류가 발생했습니다.');
+        }
+      });
+    });
+
+    // 인증 확인 버튼 클릭 시
+    $('#verifyCodeBtn').click(function() {
+      const code = $('#verificationCode').val();
+      const email = $('#email').val();
+
+      if (!code) {
+        $('#verifyResult').text('인증번호를 입력해주세요.').css('color', 'red');
+        return;
+      }
+
+      $.ajax({
+        url: '/verify-code',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ email: email, code: code }),
+        success: function(response) {
+          if (response === true || response === 'true') {
+            $('#verifyResult').text('이메일 인증이 완료되었습니다.').css('color', 'green');
+            $('#emailVerified').val('true'); // 값만 true로 변경
+          }
+          else {
+            $('#verifyResult').text('인증번호가 일치하지 않습니다.').css('color', 'red');
+            $('#emailVerified').val('false');
+          }
+        },
+        error: function() {
+          $('#verifyResult').text('서버 오류가 발생했습니다.').css('color', 'red');
+        }
+      });
+    });
+
   });
 </script>
 

@@ -14,6 +14,19 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}  # 구글 이메일 입력
+    password: ${MAIL_PASSWORD}  # 2단계 인증 앱 비밀번호 입력
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   jpa:
     hibernate:
       ddl-auto: update #??? ??

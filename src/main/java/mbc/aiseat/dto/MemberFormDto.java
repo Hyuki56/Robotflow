@@ -1,9 +1,7 @@
 package mbc.aiseat.dto;
 
+import jakarta.validation.constraints.*;
 import mbc.aiseat.entity.Member;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
@@ -30,6 +28,11 @@ public class MemberFormDto {
 
     @NotEmpty(message = "전화번호는 필수 입력 값입니다.")
     private String phone;
+
+    @NotNull(message = "이메일 인증이 필요합니다.")
+    @AssertTrue(message = "이메일 인증을 완료해주세요.")
+    private Boolean emailVerified;
+
 
     // Member 객체를 기반으로 DTO 초기화
     public MemberFormDto(Member member) {
