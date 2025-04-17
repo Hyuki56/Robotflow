@@ -29,7 +29,7 @@
                 <li sec:authorize="isAnonymous()"><a href="/login">로그인</a></li>
                 <li sec:authorize="isAuthenticated()"><a href="/logout">로그아웃</a></li>
                 <li sec:authorize="isAuthenticated()"><a href="/edit">회원정보수정/탈퇴</a></li>
-                <li  sec:authorize="isAnonymous()"><a href="/signup">회원가입</a></li>
+                <li sec:authorize="isAnonymous()"><a href="/signup">회원가입</a></li>
             </ul>
             <nav>
                 <ul class="gnb clear">
@@ -39,15 +39,26 @@
                     <li sec:authorize="hasRole('ROLE_ADMIN')"><a href="/backlive" class="openAll1">back 라이브 송출 확인</a>
                         <div class="gnb_depth gnb_depth2_1"></div>
                     </li>
-                    <li><a href="/hyuk_index" class="openAll2">CH</a> <!--최혁-->
+
+                    <!-- hyuk_index -->
+                    <li>
+                        <a href="/hyuk_index" class="openAll2" onclick="loginCheck(event, this)" data-authenticated="${#authorization.expression('isAuthenticated()')}">CH</a>
                         <div class="gnb_depth gnb_depth2_2"></div>
                     </li>
-                    <li><a href="KWJ" class="openAll3">KWJ</a> <!--김원준-->
+
+                    <!-- KWJ -->
+                    <li>
+                        <a href="/KWJ" class="openAll3" onclick="loginCheck(event, this)" data-authenticated="${#authorization.expression('isAuthenticated()')}">KWJ</a>
                         <div class="gnb_depth gnb_depth2_3"></div>
                     </li>
-                    <li><a href="/" class="openAll4">PGW</a> <!--표관우-->
+
+                    <!-- PCE -->
+                    <li>
+                        <a href="/frontend" class="openAll4" onclick="loginCheck(event, this)" data-authenticated="${#authorization.expression('isAuthenticated()')}">PCE</a>
                         <div class="gnb_depth gnb_depth2_4"></div>
                     </li>
+
+
                 </ul>
             </nav>
 
@@ -59,6 +70,17 @@
 </div>
 
 
+<script>
+    function loginCheck(event, el) {
+        const isAuthenticated = el.dataset.authenticated === "true";
+
+        if (!isAuthenticated) {
+            alert("로그인 후 이용해주세요.");
+        }
+
+        // 기본 링크 동작 그대로 유지 → 서버가 SavedRequest 이용해서 원래 페이지로 보내줌
+    }
+</script>
 
 
 </body>

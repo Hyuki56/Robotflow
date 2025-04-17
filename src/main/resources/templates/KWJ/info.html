@@ -12,15 +12,15 @@
   <tr>
     <th>좌석 이름</th>
     <th>예약자</th>
-    <th>예약 시간</th>
-    <th>승인됨</th>
+    <th>예약 등록 시각</th>
+    <th>승인여부</th>
   </tr>
   </thead>
   <tbody>
   <tr th:each="seat : ${seats}">
     <td th:text="${seat.seatName}">좌석이름</td>
     <td th:text="${seat.reservedBy}">예약자</td>
-    <td th:text="${#temporals.format(seat.reservedAt, 'yyyy-MM-dd HH:mm')}">예약시간</td>
+    <td th:text="${#temporals.format(seat.updateTime, 'yyyy-MM-dd HH:mm')}">예약시간</td>
     <td>
       <span th:text="${seat.approved ? '승인됨' : '대기중'}"></span>
       <button

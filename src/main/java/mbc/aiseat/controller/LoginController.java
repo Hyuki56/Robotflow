@@ -147,9 +147,15 @@ public class LoginController {
         return "redirect:/edit";
     }
 
-    @GetMapping("/oauth-success")
-    public String oauthSuccess() {
-        return "oauth-success";
+    @GetMapping("/oauth-success.html")
+    public String oauthSuccess(HttpServletRequest request, Model model) {
+        String redirectUrl = (String) request.getSession().getAttribute("redirectAfterOAuth");
+        if (redirectUrl == null) {
+            redirectUrl = "/";
+        }
+        model.addAttribute("redirectUrl", redirectUrl);
+        request.getSession().removeAttribute("redirectAfterOAuth"); // 사용 후 정리
+        return "oauth-success"; // templates/oauth-success.html
     }
 
 

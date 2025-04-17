@@ -8,12 +8,19 @@
 <script th:inline="javascript">
   /*<![CDATA[*/
   const fromEdit = sessionStorage.getItem("fromEdit");
-  if (fromEdit) {
-    window.opener.location.reload();
+  const redirectUrl = /*[[${redirectUrl}]]*/ '/';
+
+  if (window.opener) {
+    if (fromEdit) {
+      window.opener.location.reload();
+    } else {
+      window.opener.location.href = redirectUrl;
+    }
+    window.close();
   } else {
-    window.opener.location.href = "/";
+    // 일반 로그인으로 접근한 경우 - 현재 창에서 이동
+    window.location.href = redirectUrl;
   }
-  window.close()
   /*]]>*/
 </script>
 </body>
