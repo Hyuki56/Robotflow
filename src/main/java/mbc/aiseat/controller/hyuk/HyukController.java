@@ -20,6 +20,7 @@ public class HyukController {
             model.addAttribute("username", username); // 뷰에 넘김
         }
         return "hyuk/hyuk_index";
+
     }
 
     // 클래스 경로가 /hyuk/classRoom/class1.html 형식으로 올 거니까
