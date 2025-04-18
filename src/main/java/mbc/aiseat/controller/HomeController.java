@@ -10,4 +10,5 @@ public class HomeController {
     public String home() {
         return "index";
     }   // localhost 접속시 index.html 반환
+
 }
