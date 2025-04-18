@@ -4,7 +4,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mbc.aiseat.config.CustomUserDetails;
 import mbc.aiseat.dto.MemberEditDto;
+import mbc.aiseat.dto.MemberFindDto;
 import mbc.aiseat.dto.MemberFormDto;
+import mbc.aiseat.dto.PasswordFindDto;
 import mbc.aiseat.entity.Member;
 import mbc.aiseat.service.MemberService;
 import jakarta.validation.Valid;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -77,6 +81,12 @@ public class LoginController {
     @ResponseBody
     public boolean checkEmailDuplicate(@RequestParam String email) {
         return !memberService.isemailTaken(email); // 사용 중이면 true, 사용 가능하면 false
+    }
+
+    @GetMapping("/check-phone")
+    @ResponseBody
+    public boolean checkPhoneDuplicate(@RequestParam String phone) {
+        return !memberService.isphoneTaken(phone); // 사용 중이면 true, 사용 가능하면 false
     }
 
     @GetMapping("/edit")
@@ -157,6 +167,43 @@ public class LoginController {
         request.getSession().removeAttribute("redirectAfterOAuth"); // 사용 후 정리
         return "oauth-success"; // templates/oauth-success.html
     }
+
+    @GetMapping("/findId")
+    public String findIdForm(Model model) {
+        model.addAttribute("memberFindDto", new MemberFindDto()); // 새로운 MemberFindDto 객체 추가
+        return "findId"; // findId.html을 렌더링
+    }
+
+    @PostMapping("/findId")
+    public String findIdSearch(@Valid MemberFindDto memberFindDto,
+                               BindingResult bindingResult, Model model) {
+
+        // 폼의 유효성 검사
+        if (bindingResult.hasErrors()) {
+            return "findId"; // 유효성 검사 실패시 페이지 유지
+        }
+
+        // 이메일 찾기
+        String email = memberService.findEmailByNameAndPhone(memberFindDto.getName(), memberFindDto.getPhone());
+
+        if (email != null) {
+            model.addAttribute("email", email);
+        } else {
+            model.addAttribute("error", "일치하는 회원이 없습니다.");
+        }
+
+        return "findIdResult"; // 결과를 보여줄 페이지
+    }
+
+    @GetMapping("/findPassword")
+    public String findPasswordForm(Model model) {
+        model.addAttribute("PasswordFindDto", new PasswordFindDto());
+        return "findPassword";
+    }
+
+
+
+
 
 
 }

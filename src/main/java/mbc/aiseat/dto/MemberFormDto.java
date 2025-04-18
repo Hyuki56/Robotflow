@@ -13,8 +13,6 @@ import org.hibernate.validator.constraints.Length;
 @ToString
 public class MemberFormDto {
 
-    private Long memberId;
-
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     private String name;
 
@@ -22,8 +20,9 @@ public class MemberFormDto {
     @Email(message = "이메일 형식으로 입력해주세요.")
     private String email;
 
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()\\-_=+\\[\\]{};:'\"<>,.?/\\\\|`~]).{9,20}$",
+            message = "비밀번호는 9자 이상 20자 이하이며, 영문 대소문자, 숫자, 특수문자를 모두 포함해야 합니다.")
     @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
-    @Length(min=4, max=16, message = "비밀번호는 4자 이상, 16자 이하로 입력해주세요")
     private String password;
 
     @NotEmpty(message = "전화번호는 필수 입력 값입니다.")

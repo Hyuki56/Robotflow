@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+  <!-- ✅ Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     .error {
@@ -16,7 +18,7 @@
 
 <form action="/signup" role="form" method="post" th:object="${memberFormDto}" enctype="multipart/form-data">
 
-  <!-- 아이디 입력 -->
+  <!-- 이름 입력 -->
   <div class="form-group mb-3">
     <label th:for="name">이름</label>
     <div class="input-group">
@@ -61,6 +63,8 @@
   <div class="form-group mb-3">
     <label th:for="phone">전화번호</label>
     <input type="text" th:field="*{phone}" id="phone" class="form-control" placeholder="전화번호를 입력해주세요">
+    <button type="button" class="btn btn-outline-secondary" id="checkPhoneBtn">중복 확인</button>
+    <p id="checkPhoneResult" class="mt-1"></p>
     <button id="phoneSendBtn">전화 인증번호 전송</button>
     <button id="phoneCheckBtn" style="display:none;">전화 인증번호 확인</button> <!-- 인증 확인 버튼은 기본적으로 숨김 -->
     <p th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error">Incorrect data</p>
@@ -74,8 +78,8 @@
     <p id="phoneVerifyResult" class="mt-1"></p>
   </div>
 
-  <!-- 이메일 인증 여부 (기본 false) -->
-  <input type="hidden" th:field="*{phoneVerified}" id="phoneVerified" value="false" />
+  <!-- 전화번호 인증 여부 (기본 false) -->
+  <input type="hidden" th:field="*{phoneVerified}" id="phoneVerified" />
   <p th:if="${#fields.hasErrors('phoneVerified')}" th:errors="*{phoneVerified}" class="error"></p>
 
 
@@ -92,7 +96,7 @@
 
 <script th:inline="javascript">
   $(document).ready(function() {
-    // 중복 검사 버튼 클릭 시
+    // 이메일 중복 검사 버튼 클릭 시
     $('#checkEmailBtn').click(function() {
       var email = $('#email').val();
 
@@ -114,6 +118,32 @@
         },
         error: function() {
           $('#checkResult').text('서버 오류가 발생했습니다.').css('color', 'red');
+        }
+      });
+    });
+
+    // 전화번호 중복 검사 버튼 클릭 시
+    $('#checkPhoneBtn').click(function() {
+      var phone = $('#phone').val();
+
+      if (!phone) {
+        $('#checkPhoneResult').text('전화번호를 입력해주세요.').css('color', 'red');
+        return;
+      }
+
+      $.ajax({
+        url: '/check-phone',
+        type: 'GET',
+        data: { phone: phone },
+        success: function(response) {
+          if (response === true || response === 'true') {
+            $('#checkPhoneResult').text('사용 가능한 전화번호입니다.').css('color', 'green');
+          } else {
+            $('#checkPhoneResult').text('이미 사용 중인 전화번호입니다.').css('color', 'red');
+          }
+        },
+        error: function() {
+          $('#checkPhoneResult').text('서버 오류가 발생했습니다.').css('color', 'red');
         }
       });
     });
@@ -221,6 +251,24 @@
       // reCAPTCHA solved, allow signInWithPhoneNumber.
       // onSignInSubmit(); // 정의안되어있는데?
     }
+  });
+
+  // 전화번호 입력 자동 포맷팅 함수
+  function formatPhoneNumber(phone) {
+    phone = phone.replace(/[^0-9]/g, ''); // 숫자만 남기기
+
+    if (phone.startsWith('02')) {
+      return phone.replace(/(\d{2})(\d{3,4})(\d{4})/, '$1-$2-$3');
+    } else {
+      return phone.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+    }
+  }
+
+  // 전화번호 입력 후 자동 포맷
+  document.getElementById('phone').addEventListener('input', (event) => {
+    let phone = event.target.value;
+    phone = formatPhoneNumber(phone);
+    event.target.value = phone;
   });
 
   document.getElementById('phoneSendBtn').addEventListener('click', (event) => {
