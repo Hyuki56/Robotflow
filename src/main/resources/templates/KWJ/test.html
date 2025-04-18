@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.4/mqtt.min.js"></script>
@@ -45,7 +46,16 @@
 <body>
 <h1>객체 정보 페이지</h1>
 <a href="/"> 홈페이지 </a>
-<a href="/info"> 예약정보 및 승인처리 </a>
+<a href="/info" sec:authorize="hasRole('ROLE_ADMIN')"> 예약정보 및 승인처리 </a>
+
+<!-- 예약 정보 표시 영역 -->
+<div id="reservation-info">
+  <h2>예약 정보</h2>
+  <p id="reserved-seat"></p>
+  <p id="reservation-time"></p>
+  <!-- 예약 취소 버튼 -->
+  <button id="cancel-reservation" style="display:none;">예약 취소</button>
+</div>
 
 <!-- 좌석표 (3행 x 4열) -->
 <div class="seat-grid">
@@ -69,13 +79,13 @@
 <img id="backImage" style="max-width: 400px; display: none;">
 
 
-<script type="text/javascript">
+<script th:inline="javascript">
   const client = mqtt.connect('ws://localhost:9001');
   let Objects = null;
   let frontPrintDone = false; // 로그 첫 출력 여부
   let backPrintDone = false; // 로그 첫 출력 여부
   let frontImageDisplayed = true;
-  let backImageDisplayed = true;
+  let backImageDisplayed = false;
 
   client.on("connect", () => {
     console.log("Connected");
@@ -334,12 +344,12 @@
 // 2. y1 범위로 그룹핑
       let rows = [];
 
-// 첫 번째 행 (200 <= y1 < 260)
-      let row1 = filteredBackObjects.filter(obj => obj.box[1] >= 200 && obj.box[1] < 260);
+// 첫 번째 행 (200 <= y1 < 270)
+      let row1 = filteredBackObjects.filter(obj => obj.box[1] >= 200 && obj.box[1] < 270);
       if (row1.length > 0) rows.push(row1);
 
-// 두 번째 행 (260 <= y1 < 380)
-      let row2 = filteredBackObjects.filter(obj => obj.box[1] >= 260 && obj.box[1] < 380);
+// 두 번째 행 (270 <= y1 < 380)
+      let row2 = filteredBackObjects.filter(obj => obj.box[1] >= 270 && obj.box[1] < 380);
       if (row2.length > 0) rows.push(row2);
 
 // 세 번째 행 (380 <= y1)
@@ -365,9 +375,9 @@
 
 // 각 행에 대한 x1 범위
       const xRangesPerRow = [
-        [ [500, 600], [650, 750], [800, 900], [950, 1050] ], // A
-        [ [250, 350], [550, 650], [750, 850], [950, 1050] ], // B
-        [ [0, 100],   [300, 400], [650, 750], [1000, 1100] ]  // C
+        [ [0, 650], [650, 800], [800, 950], [950, 1200] ], // A
+        [ [0, 400], [400, 700], [700, 900], [900, 1200] ], // B
+        [ [0, 200], [200, 500], [500, 850], [850, 1200] ]  // C
       ];
 
 // 좌석 매핑 결과 저장용
@@ -401,146 +411,293 @@
       return 0; // null 또는 undefined
     }
 
-    function mergeSeatMaps(frontSeatMap, backSeatMap) {
-      const mergedSeatMap = [];
 
-      for (let row = 0; row < 3; row++) {
-        const mergedRow = [];
-
-        for (let col = 0; col < 4; col++) {
-          const frontSeat = frontSeatMap?.[row]?.[col] || null;
-          const backSeat = backSeatMap?.[row]?.[col] || null;
-
-          if (frontSeat && !backSeat) {
-            mergedRow.push(frontSeat);
-          } else if (!frontSeat && backSeat) {
-            mergedRow.push(backSeat);
-          } else if (frontSeat && backSeat) {
-            const frontPriority = getLabelPriority(frontSeat.label);
-            const backPriority = getLabelPriority(backSeat.label);
-
-            if (frontPriority > backPriority) {
-              mergedRow.push(frontSeat);
-            } else if (backPriority > frontPriority) {
-              mergedRow.push(backSeat);
-            } else {
-              // 같은 우선순위면 confidence 비교
-              mergedRow.push(
-                      frontSeat.confidence >= backSeat.confidence ? frontSeat : backSeat
-              );
-            }
-          } else {
-            mergedRow.push(null);
-          }
-        }
-
-        mergedSeatMap.push(mergedRow);
-      }
-
-      return mergedSeatMap;
-    }
-
-    async function setupSeats() {
-      const mergeSeatMap = mergeSeatMaps(frontSeatMap, backSeatMap);
-      console.log("Merged Seat Map:", mergeSeatMap);
-
-      try {
-        const res = await fetch('/reserve');
-        const data = await res.json();
-        console.log("✅ DB에서 가져온 예약 좌석 목록:", data);
-
-        // 예약 좌석을 mergeSeatMap에 반영
-        data.forEach(seat => {
-          const seatName = seat.seatName;
-          const rowChar = seatName[0]; // A, B, C...
-          const colNum = parseInt(seatName.slice(1), 10); // 1, 2, 3...
-
-          const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 'A' -> 0
-          const colIndex = colNum - 1;
-
-          if (mergeSeatMap[rowIndex] && mergeSeatMap[rowIndex][colIndex]) {
-            mergeSeatMap[rowIndex][colIndex].label = seat.approved ? 'used' : 'reserved';
-          }
-        });
-
-        const finalSeatMap = mergeSeatMap;
-        console.log("🧩 최종시트맵", finalSeatMap);
-
-        const seatLabels = [
-          ['A1', 'A2', 'A3', 'A4'],
-          ['B1', 'B2', 'B3', 'B4'],
-          ['C1', 'C2', 'C3', 'C4']
-        ];
-
-        for (let row = 0; row < seatLabels.length; row++) {
-          for (let col = 0; col < seatLabels[row].length; col++) {
-            const seatId = `seat-${row}-${col}`;
-            const seatDiv = document.getElementById(seatId);
-            const seatInfo = finalSeatMap[row][col];
-
-            seatDiv.classList.remove('empty', 'used', 'unknown', 'reserved');
-
-            if (!seatInfo) {
-              seatDiv.classList.add('unknown');
-            } else if (seatInfo.label === 'used') {
-              seatDiv.classList.add('used');
-            } else if (seatInfo.label === 'null') {
-              seatDiv.classList.add('empty');
-            } else if (seatInfo.label === 'reserved') {
-              seatDiv.classList.add('reserved');
-            } else {
-              seatDiv.classList.add('unknown');
-            }
-          }
-        }
-
-      } catch (err) {
-        console.error("❌ 좌석 정보 불러오기 실패:", err);
-      }
-    }
 
 // 호출
     setupSeats();
 
-
   }
 
-</script>
+  function mergeSeatMaps(frontSeatMap, backSeatMap) {
+    const mergedSeatMap = [];
+
+    for (let row = 0; row < 3; row++) {
+      const mergedRow = [];
+
+      for (let col = 0; col < 4; col++) {
+        const frontSeat = frontSeatMap?.[row]?.[col] || null;
+        const backSeat = backSeatMap?.[row]?.[col] || null;
+
+        if (frontSeat && !backSeat) {
+          mergedRow.push(frontSeat);
+        } else if (!frontSeat && backSeat) {
+          mergedRow.push(backSeat);
+        } else if (frontSeat && backSeat) {
+          const frontPriority = getLabelPriority(frontSeat.label);
+          const backPriority = getLabelPriority(backSeat.label);
+
+          if (frontPriority > backPriority) {
+            mergedRow.push(frontSeat);
+          } else if (backPriority > frontPriority) {
+            mergedRow.push(backSeat);
+          } else {
+            // 같은 우선순위면 confidence 비교
+            mergedRow.push(
+                    frontSeat.confidence >= backSeat.confidence ? frontSeat : backSeat
+            );
+          }
+        } else {
+          mergedRow.push(null);
+        }
+      }
+
+      mergedSeatMap.push(mergedRow);
+    }
+
+    return mergedSeatMap;
+  }
 
 
+  async function setupSeats() {
+    const mergeSeatMap = mergeSeatMaps(frontSeatMap, backSeatMap);
+    console.log("Merged Seat Map:", mergeSeatMap);
 
-<script>
+    try {
+      const res = await fetch('/reserve');
+      const data = await res.json();
+      console.log("✅ DB에서 가져온 예약 좌석 목록:", data);
+
+      // 예약 좌석을 mergeSeatMap에 반영
+      data.forEach(seat => {
+        const seatName = seat.seatName;
+        const rowChar = seatName[0]; // A, B, C...
+        const colNum = parseInt(seatName.slice(1), 10); // 1, 2, 3...
+
+        const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 'A' -> 0
+        const colIndex = colNum - 1;
+
+        if (mergeSeatMap[rowIndex] && mergeSeatMap[rowIndex][colIndex]) {
+          mergeSeatMap[rowIndex][colIndex].label = seat.approved ? 'used' : 'reserved';
+        }
+      });
+
+      const finalSeatMap = mergeSeatMap;
+      console.log("🧩 최종시트맵", finalSeatMap);
+
+      const seatLabels = [
+        ['A1', 'A2', 'A3', 'A4'],
+        ['B1', 'B2', 'B3', 'B4'],
+        ['C1', 'C2', 'C3', 'C4']
+      ];
+
+      for (let row = 0; row < seatLabels.length; row++) {
+        for (let col = 0; col < seatLabels[row].length; col++) {
+          const seatId = `seat-${row}-${col}`;
+          const seatDiv = document.getElementById(seatId);
+          const seatInfo = finalSeatMap[row][col];
+
+          seatDiv.classList.remove('empty', 'used', 'unknown', 'reserved');
+
+          if (!seatInfo) {
+            seatDiv.classList.add('unknown');
+          } else if (seatInfo.label === 'used') {
+            seatDiv.classList.add('used');
+          } else if (seatInfo.label === 'null') {
+            seatDiv.classList.add('empty');
+          } else if (seatInfo.label === 'reserved') {
+            seatDiv.classList.add('reserved');
+          } else {
+            seatDiv.classList.add('unknown');
+          }
+        }
+      }
+
+    } catch (err) {
+      console.error("❌ 좌석 정보 불러오기 실패:", err);
+    }
+  }
+
   document.querySelectorAll('.seat').forEach(seat => {
     seat.addEventListener('click', () => {
-      const seatName = seat.textContent; // 또는 innerText
-      // 'empty' 클래스가 있을 때만 반응
+      const seatName = seat.textContent; // 클릭한 좌석 이름
+      const username = /*[[${Email}]]*/ 'guest'; // 실제로는 서버에서 전달받은 사용자 이메일
+
+      console.log("username:", username);
+
+      // 'empty' 클래스가 있을 때만 클릭 허용
       if (seat.classList.contains('empty')) {
-        if (confirm(`${seatName} 좌석을 예약하시겠습니까?`)) {
+        // 먼저 사용자의 예약 여부 확인
+        fetch(`/reserved-seat/${username}`)
+                .then(res => {
+                  if (!res.ok) {
+                    throw new Error('서버 오류: ' + res.status);
+                  }
+                  return res.text(); // 먼저 text()로 받아서 확인 (null 처리를 위함)
+                })
+                .then(text => {
+                  const data = text ? JSON.parse(text) : null;
+                  if (data) {
+                    // 이미 예약된 좌석이 있는 경우
+                    const currentSeatName = data.seatName; // 예약된 좌석 이름
+                    const userMessage = `${username}님은 이미 ${currentSeatName} 좌석을 예약하셨습니다. 좌석을 변경하시겠습니까?`;
 
-          // AJAX로 서버에 예약정보 전송
-          fetch('/reserve', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ seatName })
-          })
-                  .then(res => res.json())
-                  .then(data => {
-                    if (data.success) {
-                      alert("예약 성공!");
-                      seat.classList.remove('empty');
-                      seat.classList.add('reserved');
-                    } else {
-                      alert("예약 실패: " + data.message);
+                    if (confirm(userMessage)) {
+                      // 기존 좌석에 대해 'reserved' 클래스를 'empty'로 변경
+                      const prevRow = currentSeatName.charCodeAt(0) - 'A'.charCodeAt(0); // 'A' -> 0
+                      const prevCol = parseInt(currentSeatName.slice(1)) - 1; // 1, 2, 3... -> 0, 1, 2...
+                      const prevSeatDiv = document.getElementById(`seat-${prevRow}-${prevCol}`);
+                      prevSeatDiv.classList.remove('reserved');
+                      prevSeatDiv.classList.add('empty');
+
+                      // 좌석 변경을 위한 요청
+                      fetch('/update-reservation', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          seatName: seatName,
+                          reservedBy: username
+                        })
+                      })
+                              .then(res => res.json())  // 서버 응답을 JSON으로 파싱
+                              .then(data => {
+                                if (data.success) {
+                                  alert(data.message); // "좌석 변경 성공!" 메시지 출력
+                                  seat.classList.remove('empty');
+                                  seat.classList.add('reserved');
+                                  updateReservationInfo(username);
+                                } else {
+                                  alert("좌석 변경 실패: " + data.message); // "좌석 변경 실패" 메시지 출력
+                                }
+                              })
+                              .catch(error => {
+                                alert("서버와의 통신에 문제가 발생했습니다.");
+                                console.error(error);
+                              });
+
                     }
-                  });
-
-        }
+                  } else {
+                    // 예약된 좌석이 없다면 새로운 좌석 예약
+                    if (confirm(`${seatName} 좌석을 예약하시겠습니까?`)) {
+                      // 새로운 예약을 위한 요청
+                      fetch('/reserve', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ seatName, username })
+                      })
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data.success) {
+                                  alert("예약 성공!");
+                                  seat.classList.remove('empty');
+                                  seat.classList.add('reserved');
+                                  updateReservationInfo(username);
+                                } else {
+                                  alert("예약 실패: " + data.message);
+                                }
+                              });
+                    }
+                  }
+                })
+                .catch(error => {
+                  console.error("예약 정보를 가져오는 데 실패했습니다: ", error);
+                });
       }
     });
   });
+
+
+  let currentReservation = null; // 전역 변수로 현재 예약 정보 저장
+
+  function updateReservationInfo(username) {
+    fetch(`/reserved-seat/${username}`)
+            .then(res => {
+              if (!res.ok) throw new Error('서버 오류: ' + res.status);
+              return res.text();
+            })
+            .then(text => {
+              const data = text ? JSON.parse(text) : null;
+
+              const reservedSeatElement = document.getElementById("reserved-seat");
+              const reservationTimeElement = document.getElementById("reservation-time");
+              const cancelButton = document.getElementById("cancel-reservation");
+
+              if (data && data.seatName && data.updateTime) {
+                currentReservation = {
+                  seatName: data.seatName,
+                  reservedBy: username
+                };
+
+                const date = new Date(data.updateTime);
+                const pad = n => n.toString().padStart(2, '0');
+                const formatted = `${date.getFullYear()}년 ${pad(date.getMonth() + 1)}월 ${pad(date.getDate())}일 `
+                        + `${pad(date.getHours())}시 ${pad(date.getMinutes())}분 ${pad(date.getSeconds())}초`;
+
+                reservedSeatElement.textContent = `예약된 좌석: ${data.seatName}`;
+                reservationTimeElement.textContent = `예약 등록 시각: ${formatted}`;
+                cancelButton.style.display = 'inline-block';
+              } else {
+                currentReservation = null;
+                reservedSeatElement.textContent = "예약된 좌석이 없습니다.";
+                reservationTimeElement.textContent = "";
+                cancelButton.style.display = 'none';
+              }
+            })
+            .catch(error => {
+              console.error("서버에서 예약 정보를 가져오는 중 오류가 발생했습니다:", error);
+            });
+  }
+
+  function cancelReservation() {
+    const cancelButton = document.getElementById("cancel-reservation");
+
+    cancelButton.addEventListener('click', () => {
+      if (!currentReservation) return;
+
+      const { seatName, reservedBy } = currentReservation;
+
+      if (confirm(`정말 ${seatName} 좌석 예약을 취소하시겠습니까?`)) {
+        fetch('/cancel-reservation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ seatName, reservedBy })
+        })
+                .then(res => res.json())
+                .then(response => {
+                  if (response.success) {
+                    alert("예약이 취소되었습니다.");
+                    document.getElementById("reserved-seat").textContent = "예약된 좌석이 없습니다.";
+                    document.getElementById("reservation-time").textContent = "";
+                    cancelButton.style.display = 'none';
+                    currentReservation = null;
+                    setupSeats();
+                  } else {
+                    alert("예약 취소 실패: " + response.message);
+                  }
+                })
+                .catch(error => {
+                  alert("서버와의 통신에 문제가 발생했습니다.");
+                  console.error(error);
+                });
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const username = /*[[${Email}]]*/ 'guest';
+    cancelReservation(); // 최초 1회만 리스너 등록
+    updateReservationInfo(username);
+  });
+
+
+
+
+
 </script>
+
 
 </body>
 </html>

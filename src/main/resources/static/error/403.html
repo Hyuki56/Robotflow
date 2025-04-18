@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>403 접근 거부</title>
+</head>
+<body>
+
+
+<script>
+    alert('해당 페이지에 접근할 권한이 없습니다. 창을 닫습니다.');
+
+    if (window.opener) {  // 팝업(소셜로그인)인경우
+        window.close();
+        window.opener.location.href = "/";
+    } else {    // 팝업이 아닌경우
+        location.href = "/";
+    }
+</script>
+</body>
+</html>
