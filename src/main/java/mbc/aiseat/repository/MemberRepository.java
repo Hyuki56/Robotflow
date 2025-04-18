@@ -5,6 +5,7 @@ import mbc.aiseat.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
@@ -17,4 +18,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     void deleteByStatusAndUpdateTimeBefore(MemberStatus deleted, LocalDateTime thresholdTime);
 
     Member findByProviderId(String providerId);
+
+    Member findByNameAndPhone(String name, String phone);
+
+    boolean existsByPhone(String phone);
 }

@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -62,6 +63,11 @@ public class MemberService {
         return memberRepository.existsByEmail(email); // true면 이미 사용 중
     }
 
+    @Transactional(readOnly = true)
+    public boolean isphoneTaken(String phone) {
+        return memberRepository.existsByPhone(phone); // true면 이미 사용 중
+    }
+
     public void updateMember(MemberEditDto memberEditDto) {
 
         Member member = memberRepository.findByEmail(memberEditDto.getEmail());
@@ -100,6 +106,15 @@ public class MemberService {
             member.setProviderId(null);
             memberRepository.save(member);
         }
+    }
+
+    // 이름과 전화번호로 회원 이메일 찾기
+    public String findEmailByNameAndPhone(String name, String phone) {
+        Member member = memberRepository.findByNameAndPhone(name, phone);
+        if (member != null) {
+            return member.getEmail();
+        }
+        return null; // 회원이 없으면 null 반환
     }
 
 }

@@ -1,0 +1,29 @@
+/* common.css */
+
+/* layout_base.css를 임포트 */
+@import url('layout_base.css');
+
+/* 추가적인 스타일링 */
+h1 {
+    font-size: 2em;
+    color: #333;
+    text-align: center;
+}
+
+p {
+    font-size: 1.2em;
+    line-height: 1.6;
+    color: #666;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

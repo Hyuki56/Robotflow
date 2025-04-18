@@ -19,19 +19,21 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
+    private final CustomLoginSuccessHandler customLoginSuccessHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.info("----------SecurityFilterChain 진입 체크----------");
 
         http
                 .authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers("/member/**").hasAnyRole("ADMIN", "USER")
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/frontlive", "/backlive","/info").hasRole("ADMIN")
+                        .requestMatchers("/hyuk_index", "/KWJ","/frontend", "/edit").hasAnyRole("ADMIN","USER")
                         .anyRequest().permitAll()
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
-                        .defaultSuccessUrl("/")
+                        .successHandler(customLoginSuccessHandler) // 여기에 설정
                         .usernameParameter("email")
                         .failureUrl("/login/error")
                 )
@@ -40,25 +42,23 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)  // 이 줄 중요!
                         )
-                        .defaultSuccessUrl("/oauth-success")
-                        .failureUrl("/login/error")
+                        .successHandler(customLoginSuccessHandler) // 소셜도 동일 처리
+                        .failureUrl("/oauth-login-error.html") // 수정된 부분
                 )
 
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("/")
                 )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/access-denied")
+                ) //403 처리
                 .csrf(csrf -> csrf
 //                        .ignoringRequestMatchers("/get-user-name") // 이 엔드포인트는 누구나 접근 가능하도록 설정
                                 .disable()
                 );
 
-//        http.formLogin()
-//                .loginPage("/login")
-//                .permitAll()
-//                .and()
-//                .exceptionHandling()
-//                .accessDeniedPage("/access-denied"); // 접근 거부 시 리다이렉트될 페이지
+
 
         return http.build();
     }
