@@ -5,6 +5,10 @@ spring:
   application:
     name: www
 
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/, classpath:/resources/, classpath:/static/, classpath:/public/
+
   config:
     import: optional:file:.env[.properties] # 보안이 중요한 정보들은 env 파일로 관리
 
@@ -38,8 +42,6 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect #SQL ??(dialect)? ????, ? ??????? ???? ??? ?? ??
 
   servlet:
-    session:
-      timeout: 30m
     multipart:
       enabled: true
       max-file-size: 20MB  # ?? ?? ?? ??
