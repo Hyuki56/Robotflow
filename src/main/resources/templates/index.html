@@ -2,86 +2,82 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Title</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-
+    <title>홈페이지</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<!-- wrap -->
-<div id="wrap">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">홈페이지</a>
 
-<header id="header">
+        <div class="collapse navbar-collapse justify-content-end" id="navbarMenu">
+            <!-- 로그인된 사용자 환영 메시지 -->
+            <span class="navbar-text text-white me-3" sec:authorize="isAuthenticated()"
+                  th:text="${#authentication.principal.name} + '님 환영합니다.'"></span>
 
-    <div class="header_area box_inner clear">
-        <h1><a href="Javascript:;">홈페이지</a></h1>
-
-        <div class="navbar-text me-5" sec:authorize="isAuthenticated()">
-            <span th:text=" ${#authentication.principal.name} + '님 환영합니다.'"></span>
-        </div>
-
-        <!-- header_cont -->
-        <div class="header_cont">
-            <ul class="util clear">
-                <li sec:authorize="isAnonymous()"><a href="/login">로그인</a></li>
-                <li sec:authorize="isAuthenticated()"><a href="/logout">로그아웃</a></li>
-                <li sec:authorize="isAuthenticated()"><a href="/edit">회원정보수정/탈퇴</a></li>
-                <li sec:authorize="isAnonymous()"><a href="/signup">회원가입</a></li>
+            <!-- 로그인/회원가입 or 로그아웃/정보수정 -->
+            <ul class="navbar-nav">
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" href="/login">로그인</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" href="/signup">회원가입</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="/edit">회원정보수정/탈퇴</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="/logout">로그아웃</a>
+                </li>
             </ul>
-            <nav>
-                <ul class="gnb clear">
-                    <li><a href="/frontlive" class="openAll1">front 라이브 송출 확인</a>
-                        <div class="gnb_depth gnb_depth2_1"></div>
-                    </li>
-                    <li><a href="/backlive" class="openAll1">back 라이브 송출 확인</a>
-                        <div class="gnb_depth gnb_depth2_1"></div>
-                    </li>
-
-                    <!-- hyuk_index -->
-                    <li>
-                        <a href="/hyuk_index" class="openAll2" onclick="loginCheck(event, this)" data-authenticated="${#authorization.expression('isAuthenticated()')}">CH</a>
-                        <div class="gnb_depth gnb_depth2_2"></div>
-                    </li>
-
-                    <!-- KWJ -->
-                    <li>
-                        <a href="/KWJ" class="openAll3" onclick="loginCheck(event, this)" data-authenticated="${#authorization.expression('isAuthenticated()')}">KWJ</a>
-                        <div class="gnb_depth gnb_depth2_3"></div>
-                    </li>
-
-                    <!-- PCE -->
-                    <li>
-                        <a href="/frontend" class="openAll4" onclick="loginCheck(event, this)" data-authenticated="${#authorization.expression('isAuthenticated()')}">PCE</a>
-                        <div class="gnb_depth gnb_depth2_4"></div>
-                    </li>
-
-
-                </ul>
-            </nav>
-
-            </div>
-            <!-- //header_cont -->
         </div>
-    </header>
+    </div>
+</nav>
 
+<!-- GNB 메뉴 영역 -->
+<div class="bg-light border-bottom py-2">
+    <div class="container">
+        <ul class="nav justify-content-center">
+            <!-- 관리자 메뉴 -->
+            <li class="nav-item dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
+                <a class="nav-link dropdown-toggle text-primary fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                    라이브 송출 확인
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/frontlive">Front 라이브</a></li>
+                    <li><a class="dropdown-item" href="/backlive">Back 라이브</a></li>
+                </ul>
+            </li>
+
+            <!-- CH / KWJ / PCE 메뉴 -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    콘텐츠
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/hyuk_index" onclick="loginCheck(event, this)" th:data-authenticated="${#authorization.expression('isAuthenticated()')}">CH</a></li>
+                    <li><a class="dropdown-item" href="/KWJ" onclick="loginCheck(event, this)" th:data-authenticated="${#authorization.expression('isAuthenticated()')}">KWJ</a></li>
+                    <li><a class="dropdown-item" href="/frontend" onclick="loginCheck(event, this)" th:data-authenticated="${#authorization.expression('isAuthenticated()')}">PCE</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </div>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     function loginCheck(event, el) {
         const isAuthenticated = el.dataset.authenticated === "true";
-
         if (!isAuthenticated) {
             alert("로그인 후 이용해주세요.");
         }
-
-        // 기본 링크 동작 그대로 유지 → 서버가 SavedRequest 이용해서 원래 페이지로 보내줌
     }
 </script>
-
-
 </body>
 </html>
