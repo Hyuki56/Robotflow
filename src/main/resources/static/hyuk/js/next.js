@@ -1,15 +1,22 @@
 async function populate() {
-  const response = await fetch('/hyuk/json/hyuk_test.json');
+  const response = await fetch('/hyuk/json/hyuk_test.json'); // ✅ 절대 경로
   const data = await response.json();
   populateHeader(data);
 
-  await updateAllClassroomStatus(data); // ✅ 통합된 함수로 교체
+  // 두 개의 classNum을 비동기적으로 처리
+  await Promise.all([
+    updateClassroomStatus(data, 1), // Class 1
+    updateClassroomStatus(data, 2)  // Class 2
+  ]);
 
   setInterval(() => {
-    updateAllClassroomStatus(data);
+    // 5초마다 두 개의 classNum을 동시에 갱신
+    Promise.all([
+      updateClassroomStatus(data, 1),
+      updateClassroomStatus(data, 2)
+    ]);
   }, 5000);
 }
-
 
 function populateHeader(obj) {
   const header = document.querySelector('header');
@@ -27,28 +34,18 @@ async function fetchSeatStatus(classNum) {
   return await res.json();
 }
 
-async function updateAllClassroomStatus(obj) {
+async function updateClassroomStatus(obj, classNum) {
+  const seatData = await fetchSeatStatus(classNum); // classNum을 전달
   const section = document.querySelector('section');
-  section.innerHTML = ''; // ❗️한 번만 지우고
-
-  // 두 강의실 데이터 한 번에 가져옴
-  const [seatData1, seatData2] = await Promise.all([
-    fetchSeatStatus(1),
-    fetchSeatStatus(2),
-  ]);
-
-  const allSeatData = {
-    class1: seatData1,
-    class2: seatData2
-  };
+  section.innerHTML = '';
 
   for (const room of obj.members) {
-    const roomName = room.name; // class1, class2
-    const seats = allSeatData[roomName][roomName];
+    const roomName = room.name;
+    const seats = seatData[roomName];
 
-    if (!seats) {
+    if (!seats) { // seats가 undefined 또는 null일 경우 처리
       console.error(`Room ${roomName} has no seat data`);
-      continue;
+      continue; // 다음 room으로 넘어가기
     }
 
     const total = Object.keys(seats).length;
@@ -91,8 +88,6 @@ async function updateAllClassroomStatus(obj) {
     section.appendChild(article);
   }
 }
-
-
 
 // 한 번에 1, 2를 불러오기
 populate();
