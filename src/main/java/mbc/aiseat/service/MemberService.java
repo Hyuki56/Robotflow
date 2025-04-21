@@ -117,4 +117,22 @@ public class MemberService {
         return null; // 회원이 없으면 null 반환
     }
 
+
+    // ✅ 비밀번호 재설정 메서드
+    public void updatePassword(String email, String newPassword) {
+        log.info("비번재설정 서비스진입");
+        log.info("email: " + email);
+        Member member = memberRepository.findByEmail(email);
+        log.info("member: " + member);
+
+        if (member == null) {
+            throw new IllegalArgumentException("해당 이메일의 회원을 찾을 수 없습니다.");
+        }
+
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
+    }
+
+
+
 }

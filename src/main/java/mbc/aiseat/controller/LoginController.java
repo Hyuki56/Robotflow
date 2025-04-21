@@ -3,10 +3,7 @@ package mbc.aiseat.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mbc.aiseat.config.CustomUserDetails;
-import mbc.aiseat.dto.MemberEditDto;
-import mbc.aiseat.dto.MemberFindDto;
-import mbc.aiseat.dto.MemberFormDto;
-import mbc.aiseat.dto.PasswordFindDto;
+import mbc.aiseat.dto.*;
 import mbc.aiseat.entity.Member;
 import mbc.aiseat.service.MemberService;
 import jakarta.validation.Valid;
@@ -39,7 +36,7 @@ public class LoginController {
     @GetMapping(value = "/signup") // 회원가입 페이지
     public String memberForm(Model model) {
         model.addAttribute("memberFormDto", new MemberFormDto());
-        return "signup";
+        return "/signup";
     }
 
     @PostMapping(value = "/signup") // 회원가입 처리
@@ -47,7 +44,7 @@ public class LoginController {
                              BindingResult bindingResult, Model model) throws Exception
     {
         if(bindingResult.hasErrors()) {
-            return "signup";
+            return "/signup";
         }
 
         try{
@@ -105,7 +102,7 @@ public class LoginController {
         model.addAttribute("isLinked", isLinked); // 소셜 연동 여부 플래그 추가
         model.addAttribute("provider", provider);
 
-        return "edit";
+        return "/edit";
     }
 
     @PostMapping("/edit")
@@ -114,7 +111,7 @@ public class LoginController {
                              Model model) {
 
         if (bindingResult.hasErrors()) {
-            return "edit";
+            return "/edit";
         }
 
         try {
@@ -136,7 +133,7 @@ public class LoginController {
 
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "edit";
+            return "/edit";
         }
 
         return "redirect:/"; // 수정 완료 후 리다이렉트
@@ -165,13 +162,13 @@ public class LoginController {
         }
         model.addAttribute("redirectUrl", redirectUrl);
         request.getSession().removeAttribute("redirectAfterOAuth"); // 사용 후 정리
-        return "oauth-success"; // templates/oauth-success.html
+        return "/oauth-success"; // templates/oauth-success.html
     }
 
     @GetMapping("/findId")
     public String findIdForm(Model model) {
         model.addAttribute("memberFindDto", new MemberFindDto()); // 새로운 MemberFindDto 객체 추가
-        return "findId"; // findId.html을 렌더링
+        return "/findId"; // findId.html을 렌더링
     }
 
     @PostMapping("/findId")
@@ -180,7 +177,7 @@ public class LoginController {
 
         // 폼의 유효성 검사
         if (bindingResult.hasErrors()) {
-            return "findId"; // 유효성 검사 실패시 페이지 유지
+            return "/findId"; // 유효성 검사 실패시 페이지 유지
         }
 
         // 이메일 찾기
@@ -192,14 +189,77 @@ public class LoginController {
             model.addAttribute("error", "일치하는 회원이 없습니다.");
         }
 
-        return "findIdResult"; // 결과를 보여줄 페이지
+        return "/findIdResult"; // 결과를 보여줄 페이지
     }
 
     @GetMapping("/findPassword")
     public String findPasswordForm(Model model) {
-        model.addAttribute("PasswordFindDto", new PasswordFindDto());
-        return "findPassword";
+        model.addAttribute("passwordFindDto", new PasswordFindDto());
+        return "/findPassword";
     }
+
+    @PostMapping("/findPassword")
+    public String findPassword(@Valid PasswordFindDto passwordFindDto,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "/findPassword";
+        }
+
+        // 이메일을 redirect 파라미터로 전달
+        redirectAttributes.addAttribute("email", passwordFindDto.getEmail());
+        return "redirect:/resetPassword";
+    }
+
+    @GetMapping("/resetPassword")
+    public String resetPasswordForm(@RequestParam(required = false) String email, Model model) {
+        PasswordResetDto dto = new PasswordResetDto();
+        dto.setEmail(email); // 전달된 이메일을 세팅
+        model.addAttribute("passwordResetDto", dto);
+        return "/resetPassword";
+    }
+
+    @PostMapping("/resetPassword")
+    public String resetPassword(@Valid PasswordResetDto passwordResetDto,
+                                BindingResult bindingResult,
+                                Model model) {
+
+        log.info("passwordResetDto: " + passwordResetDto.toString());
+
+        log.info("유효성 검사 직전");
+
+        // 기본 유효성 검사
+        if (bindingResult.hasErrors()) {
+            return "/resetPassword";
+        }
+
+        log.info("일치 여부 확인 직전");
+
+        // 비밀번호 일치 여부 확인
+        if (!passwordResetDto.isPasswordMatched()) {
+            model.addAttribute("passwordMismatch", true);
+            return "/resetPassword";
+        }
+
+        log.info("비밀번호재설정처리 직전");
+
+        // 실제 비밀번호 재설정 처리
+        try {
+            log.info("try 안");
+            log.info("이메일: " + passwordResetDto.getEmail());
+            log.info("패스워드: " + passwordResetDto.getNewPassword());
+            memberService.updatePassword(passwordResetDto.getEmail(), passwordResetDto.getNewPassword());
+        } catch (IllegalArgumentException e) {
+            log.info("catch 안");
+            model.addAttribute("passwordResetError", e.getMessage());
+            return "resetPassword"; // 이메일이 없을 경우 오류 메시지 표시
+        }
+
+        return "redirect:/login"; // 성공적으로 변경 후 로그인 페이지로
+    }
+
+
 
 
 
