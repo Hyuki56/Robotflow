@@ -16,7 +16,7 @@ public class UserCleanupService {
     private MemberRepository memberRepository; // 사용자 정보를 관리하는 repository
 
     // 일정 시간(예: 30초) 이상 지난 'DELETED' 상태의 사용자 삭제
-    @Scheduled(fixedRate = 10000000)  // 10000초마다
+    @Scheduled(fixedRate = 10000000)  // 10000초마다 (1000000ms)
     @Transactional
     public void deleteInactiveUsers() {
 

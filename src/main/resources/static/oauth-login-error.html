@@ -9,16 +9,22 @@
 <body>
 
 <script>
-  // 로그인 실패 메시지 처리
   window.onload = function() {
-    // 로그인 실패 메시지를 alert로 띄우기
-    alert("해당 소셜계정과 연동된 아이디가 존재하지 않습니다.\n" +
-            "로그인 후 연동설정을 해주세요.");
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
 
-    // 알림창을 닫은 후 팝업을 닫기
+    let message = "알 수 없는 오류가 발생했습니다.";
+
+    if (error === "no_linked_account") {
+      message = "해당 소셜계정과 연동된 아이디가 존재하지 않습니다.\n로그인 후 연동설정을 해주세요.";
+    } else if (error === "linked_account_exists") {
+      message = "이미 다른 계정에 연동된 소셜 계정입니다.\n해당 계정으로 로그인하거나 관리자에게 문의하세요.";
+    }
+
+    alert(message);
     window.close();
   }
-
 </script>
+
 </body>
 </html>

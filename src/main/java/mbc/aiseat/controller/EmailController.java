@@ -23,9 +23,17 @@ public class EmailController {
     @PostMapping("/send-verification-code")
     public ResponseEntity<String> sendCode(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
-        emailService.sendVerificationCode(email);
-        return ResponseEntity.ok("인증번호 전송 완료");
+        String purpose = payload.getOrDefault("purpose", "register"); // 기본값: 회원가입
+
+        boolean result = emailService.sendVerificationCode(email, purpose);
+        if (result) {
+            return ResponseEntity.ok("인증번호 전송 완료");
+        } else {
+            return ResponseEntity.badRequest().body("존재하지 않는 이메일입니다.");
+        }
     }
+
+
 
     // 인증번호 검증
     @PostMapping("/verify-code")
