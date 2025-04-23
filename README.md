@@ -1,4 +1,4 @@
-#  💻 아나바다 💻
+#  💻 CCTV 객체 탐지를 활용한 공석 확인 및 예약 시스템 💻
 
 
 </div>
@@ -9,7 +9,6 @@
 02. [📖 프로젝트 소개](#-프로젝트-소개)
 03. [💡 기획 의도](#기획-의도)
 04. [🙋‍♀️ Team_Member](#%EF%B8%8F-team_member-%EF%B8%8F)
-05. [📊 Diagram](#-다이어그램-)
 06. [📹 기능 설명](#-기능-설명-)
 07. [🤐개선 사항](#-개선-사항-)
 08. [🔨개발 환경](#-개발-환경-)
@@ -46,68 +45,25 @@
       
 ## 📖 프로젝트 소개📖
 
-아나바다 - 누구나 쉽게 중고 거래를 시작할 수 있는 플랫폼
 
-아나바다는 개인 간 중고 물품 거래를 쉽게 연결해주는 온라인 마켓입니다. 
-사용자는 간단한 회원 가입 후 물품을 판매하거나 구매할 수 있으며, 거래가 안전하고 편리하게 이루어질 수 있도록 다양한 기능을 제공합니다.
-
-- 판매자는 물품을 등록하고 판매할 수 있으며, 판매 중인 물품에 대해 관심을 표명한 구매자와 소통할 수 있습니다.
-- 구매자는 원하는 물품을 검색하고, 원하는 가격에 맞는 물품을 찾아 안전하게 거래할 수 있습니다.
-- 게시판을 통해 물품에 대한 질문 및 거래와 관련된 커뮤니케이션을 쉽게 할 수 있습니다.
 
 ## 💡기획 의도💡
 
-- 중고거래 시장의 성장: 최근 몇 년간 중고거래 시장은 급격히 성장했으며, 개인 간 거래가 활성화되고 있습니다. 
-  특히, 경제적인 이유나 환경적 요인으로 중고 거래에 대한 수요가 높아지고 있습니다.
-- 안전하고 편리한 거래 환경 제공: 구매자와 판매자 간의 신뢰를 쌓을 수 있는 안전한 거래 환경을 제공하는 것이 중요합니다. 
-  이를 위해 중고거래에서 발생할 수 있는 여러 문제를 해결할 수 있는 기능들을 제공하고자 합니다.
-- 다양한 연령층을 위한 플랫폼: 중고거래는 청년층부터 노년층까지 다양한 연령층에서 이루어지고 있습니다. 
-  따라서 누구나 쉽게 접근할 수 있는 직관적인 UI/UX와 사용 편리성을 제공하는 것이 중요합니다.
+
 
 ## 🙋‍♀️ Team_Member 🙋‍♀️
 
 <div align="center">
 
-| **김원준** | **이종현** | **안정운** |
+| **김원준** | **최 혁** | **박채은** |
 | :------: |  :------: | :------: |
-| [<img src="https://github.com/user-attachments/assets/bc978a09-9607-4132-9e84-a6692df41c9e" height=166 width=150> <br/> @kWJ30](https://github.com/kWJ30) | [<img src="https://github.com/user-attachments/assets/b8c1b68f-3998-4eb4-bdc9-b47893de44c1" height=166 width=150> <br/> @J0hyun](https://github.com/J0hyun) | [<img src="https://github.com/user-attachments/assets/4ce3300c-95d9-4b0a-9827-cfe162111d7c" height=166 width=150> <br/> @jungwoonAn](https://github.com/jungwoonAn) |
+| (https://github.com/kWJ30) | (https://github.com/J0hyun) | (https://github.com/jungwoonAn) |
 | 로그인 API <br> 회원정보 등록/수정/탈퇴 <br> 상품 등록/수정/삭제 <br> 아이디/비밀번호찾기 <br> | 리뷰 등록/수정/삭제 <br> 실시간양방향 채팅 <br> (WebSocket, Stomp) |  프론트엔드 <br> 상품등록 카테고리 ajax <br> 페이징및검색 <br> 결제,주소API |
 </div>
 
 </div>
 
  
-
-## 📊 다이어그램 📊
-
-<details><summary>Usecase</summary>
-      
-![usecase](https://github.com/user-attachments/assets/27e792e0-8f54-4523-b2de-1f938a019fe4)
-
-</details>
-
-<details><summary>ERD</summary>
-      
-![used_trade_site_ERD](https://github.com/user-attachments/assets/b13bddf5-ddf7-4959-a893-f9af93b3dbc1)
-
-</details>
-
-<details><summary>Class Diagram</summary>
-
-1. Member
-![Member](https://github.com/user-attachments/assets/e198d9f1-2abe-4793-b0d4-2cb04ff53ed3)
-
-2. Item
-![Item](https://github.com/user-attachments/assets/d44b8266-e71d-4146-b406-d13790da1aa8)
-
-3. Review
-![Review](https://github.com/user-attachments/assets/484cff66-750d-41b1-bcac-e2c98ed36ddf)
-
-4. Chat
-![Chat](https://github.com/user-attachments/assets/049a3f9c-1f7d-4bca-9a1c-dc9ebf0e7dbb)
-
-</details>
-
 
 ## 📹 기능 설명 📹
 
@@ -118,59 +74,6 @@
 https://github.com/user-attachments/assets/8c990eea-288a-46ea-b6e9-b794517d49cb
 
 </details>
-
-<details><summary>로그인/회원가입</summary>
-<br/>
-
-https://github.com/user-attachments/assets/e4831f2e-7556-4f1d-bb77-f0052b7c69e7
-
-
-</details>
-
-<details><summary>아이디/비밀번호찾기</summary>
-<br/>
-
-https://github.com/user-attachments/assets/e63f87a2-39cc-4af6-8baa-8b40a5f5628f
-
-</details>
-
-<details><summary>회원정보 수정/탈퇴</summary>
-<br/>
-
-https://github.com/user-attachments/assets/4795b44a-bb97-464e-8715-6ad82af60f64
-
-</details>
-
-<details><summary>상품 등록/수정하기</summary>
-<br/>
-
-https://github.com/user-attachments/assets/8519381d-9f5a-448e-a8f7-967b84592087
-
-</details>
-
-<details><summary>실시간 채팅하기</summary>
-<br/>
-
-https://github.com/user-attachments/assets/75ac5285-479b-48ad-a9b4-2b34954f6fe2
-
-</details>
-
-<details><summary>구매 및 취소 </summary>
-<br/>
-
-https://github.com/user-attachments/assets/8eee3790-4ee3-4ccf-8d9c-e32d0422fa1d
-
-</details>
-
-<details><summary>리뷰 작성/수정하기</summary>
-<br/>
-
-https://github.com/user-attachments/assets/24011f61-e775-4ae8-8463-51a4b94873a4
-
-</details>
-
-
-
 
 
 ## 🤐 개선 사항 🤐
