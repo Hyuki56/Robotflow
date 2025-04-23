@@ -55,7 +55,7 @@
   <!-- 비밀번호 입력 -->
   <div class="form-group mb-3">
     <label th:for="password">비밀번호</label>
-    <input type="password" th:field="*{password}" class="form-control" placeholder="비밀번호 입력">
+    <input type="text" th:field="*{password}" class="form-control" placeholder="비밀번호 입력">
     <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error">Incorrect data</p>
   </div>
 
@@ -160,7 +160,10 @@
         url: '/send-verification-code',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ email: email }),
+        data: JSON.stringify({
+          email: email,
+          purpose: 'register' // ✅ 회원가입 목적 명시
+        }),
         success: function(response) {
           alert('인증번호가 이메일로 전송되었습니다.');
           $('#verifySection').show(); // 인증번호 입력창 표시
@@ -170,6 +173,7 @@
         }
       });
     });
+
 
     // 인증 확인 버튼 클릭 시
     $('#verifyCodeBtn').click(function() {

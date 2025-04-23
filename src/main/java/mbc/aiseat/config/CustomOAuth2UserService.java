@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -92,7 +93,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 if (existingLinkedMember != null && !existingLinkedMember.getEmail().equals(member.getEmail())) {
                     // 다른 계정에 이미 연결된 소셜 계정 → 연동 거부
                     log.warn("연동 실패: 이미 다른 계정에 연동된 소셜 계정입니다. providerId={}, email={}", providerId, existingLinkedMember.getEmail());
-                    throw new OAuth2AuthenticationException("이미 다른 계정에 연동된 소셜 계정입니다.");
+                    throw new OAuth2AuthenticationException(
+                            new OAuth2Error("linked_account_exists", "이미 다른 계정에 연동된 소셜 계정입니다.", null),
+                            "이미 다른 계정에 연동된 소셜 계정입니다."
+                    );
+
                 }
 
                 member.setProvider(registrationId);
@@ -106,7 +111,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
             if (member == null) {
                 log.warn("소셜 로그인 실패: 등록된 providerId 없음 -> 로그인 거부");
-                throw new OAuth2AuthenticationException("소셜 로그인 실패: 등록된 계정이 없습니다.");
+                throw new OAuth2AuthenticationException(
+                        new OAuth2Error("no_linked_account", "소셜 로그인 실패: 등록된 계정이 없습니다.", null),
+                        "소셜 로그인 실패: 등록된 계정이 없습니다."
+                );
+
+
+
             }
         }
 
