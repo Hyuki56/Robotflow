@@ -9,6 +9,11 @@ public class HomeController {
     @GetMapping("/")
     public String home() {
         return "index";
-    }   // localhost 접속시 index.html 반환
 
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "test";
+    }// localhost 접속시 index.html 반환
 }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>연동 완료</title>
+</head>
+<body>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const fromEdit = sessionStorage.getItem("fromEdit");
+  const redirectUrl = /*[[${redirectUrl}]]*/ '/';
+
+  if (window.opener) { // 소셜 로그인
+    if (fromEdit) {
+      window.opener.location.reload();
+    } else {
+      window.opener.location.href = redirectUrl;
+    }
+    window.close();
+  } else {
+    // 일반 로그인으로 접근한 경우 - 현재 창에서 이동
+    window.location.href = redirectUrl;
+  }
+  /*]]>*/
+</script>
+</body>
+</html>

@@ -1,13 +1,15 @@
 async function populate() {
-  const response = await fetch('/hyuk/json/hyuk_test.json'); // ✅ 절대 경로
+  const response = await fetch('/hyuk/json/hyuk_test.json');
   const data = await response.json();
   populateHeader(data);
-  await updateClassroomStatus(data);
+
+  await updateAllClassroomStatus(data); // ✅ 통합된 함수로 교체
 
   setInterval(() => {
-    updateClassroomStatus(data);
+    updateAllClassroomStatus(data);
   }, 5000);
 }
+
 
 function populateHeader(obj) {
   const header = document.querySelector('header');
@@ -20,19 +22,35 @@ function populateHeader(obj) {
   header.appendChild(myPara);
 }
 
-async function fetchSeatStatus() {
-  const res = await fetch('/hyuk/json/seats_status.json'); // ✅ 경로 수정
+async function fetchSeatStatus(classNum) {
+  const res = await fetch(`/api/class${classNum}/seats`);
   return await res.json();
 }
 
-async function updateClassroomStatus(obj) {
-  const seatData = await fetchSeatStatus();
+async function updateAllClassroomStatus(obj) {
   const section = document.querySelector('section');
-  section.innerHTML = '';
+  section.innerHTML = ''; // ❗️한 번만 지우고
+
+  // 두 강의실 데이터 한 번에 가져옴
+  const [seatData1, seatData2] = await Promise.all([
+    fetchSeatStatus(1),
+    fetchSeatStatus(2),
+  ]);
+
+  const allSeatData = {
+    class1: seatData1,
+    class2: seatData2
+  };
 
   for (const room of obj.members) {
-    const roomName = room.name;
-    const seats = seatData[roomName];
+    const roomName = room.name; // class1, class2
+    const seats = allSeatData[roomName][roomName];
+
+    if (!seats) {
+      console.error(`Room ${roomName} has no seat data`);
+      continue;
+    }
+
     const total = Object.keys(seats).length;
     const used = Object.values(seats).filter(status => status === 'used').length;
     const available = total - used;
@@ -44,10 +62,9 @@ async function updateClassroomStatus(obj) {
     const info = document.createElement('p');
     const ul = document.createElement('ul');
 
-    // 링크 오타 수정: calssRoom → classRoom
     const link = document.createElement('a');
     const roomNum = roomName.match(/\d+/)?.[0];
-    link.href = `classRoom/class${roomNum}.html`; // ✅ 수정 완료
+    link.href = `classRoom/class${roomNum}.html`;
     title.textContent = roomName;
     link.appendChild(title);
 
@@ -75,4 +92,7 @@ async function updateClassroomStatus(obj) {
   }
 }
 
+
+
+// 한 번에 1, 2를 불러오기
 populate();

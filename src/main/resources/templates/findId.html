@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>아이디 찾기</title>
+    <!-- jQuery CDN 추가 (부트스트랩보다 위에 두는 것이 일반적임) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- ✅ Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ✅ 전체를 가운데 정렬 -->
+<div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
+    <div class="w-100" style="max-width: 400px;">
+        <h2 class="text-center mb-4">아이디 찾기</h2>
+
+        <form action="/findId" method="post" th:object="${memberFindDto}" role="form">
+            <div class="mb-3">
+                <label for="name" class="form-label">이름</label>
+                <div class="input-group">
+                <input type="text" class="form-control" th:field="*{name}" id="name" placeholder="이름을 입력해주세요">
+                </div>
+                <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error">Incorrect data</p>
+            </div>
+
+
+            <div class="mb-3">
+                <label for="phone" class="form-label">전화번호</label>
+                <input type="text" class="form-control" th:field="*{phone}" id="phone" placeholder="전화번호를 입력해주세요">
+                <p th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error">Incorrect data</p>
+            </div>
+
+            <!-- 전화번호 인증 버튼 (인증번호 전송) -->
+            <div class="mb-3">
+                <button type="button" id="phoneSendBtn" class="btn btn-secondary w-100">인증번호 전송</button>
+            </div>
+
+            <!-- 인증번호 입력란 (숨김처리 후 인증번호 전송 후 표시됨) -->
+            <div class="form-group mb-3" id="phoneVerifySection" style="display:none;">
+                <label for="phoneVerificationCode">인증번호 입력</label>
+                <input type="text" id="phoneVerificationCode" class="form-control" placeholder="인증번호를 입력해주세요">
+                <button type="button" class="btn btn-outline-success mt-2" id="phoneVerifyCodeBtn">인증 확인</button>
+                <p id="phoneVerifyResult" class="mt-1"></p>
+            </div>
+
+            <!-- 전화번호 인증 여부를 서버로 전달하는 hidden 필드 -->
+            <input type="hidden" th:field="*{phoneVerified}" id="phoneVerified">
+            <p th:if="${#fields.hasErrors('phoneVerified')}" th:errors="*{phoneVerified}" class="error"></p>
+
+            <!-- 아이디 찾기 버튼 -->
+            <div>
+                <button type="submit" class="btn btn-primary w-100">아이디 찾기</button>
+            </div>
+        </form>
+
+
+
+        <div class="mt-3 text-center">
+            <a href="/login" class="btn btn-link">로그인 페이지로 돌아가기</a>
+        </div>
+    </div>
+</div>
+
+
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+    import {
+        getAuth,
+        signInWithPhoneNumber,
+        RecaptchaVerifier
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyBGGeZcBYfNXX6GX1WsWQW2mpDBmMcgSBA",
+        authDomain: "aiseat-878b1.firebaseapp.com",
+        projectId: "aiseat-878b1",
+        storageBucket: "aiseat-878b1.firebasestorage.app",
+        messagingSenderId: "1028393632493",
+        appId: "1:1028393632493:web:7e9368b06d34ef0038c2e4",
+        measurementId: "G-FHS9S7L3X3"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth();
+    auth.languageCode = 'ko';
+
+
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'phoneSendBtn', {
+        'size': 'invisible',
+        'callback': (response) => {
+            console.log('reCAPTCHA solved:', response);
+            // reCAPTCHA solved, allow signInWithPhoneNumber.
+            // onSignInSubmit(); // 정의안되어있는데?
+        }
+    });
+
+    // 전화번호 입력 자동 포맷팅 함수
+    function formatPhoneNumber(phone) {
+        phone = phone.replace(/[^0-9]/g, ''); // 숫자만 남기기
+
+        if (phone.startsWith('02')) {
+            return phone.replace(/(\d{2})(\d{3,4})(\d{4})/, '$1-$2-$3');
+        } else {
+            return phone.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+        }
+    }
+
+    // 전화번호 입력 후 자동 포맷
+    document.getElementById('phone').addEventListener('input', (event) => {
+        let phone = event.target.value;
+        phone = formatPhoneNumber(phone);
+        event.target.value = phone;
+    });
+
+    document.getElementById('phoneSendBtn').addEventListener('click', (event) => {
+        event.preventDefault();
+        const phoneNumber = document.getElementById('phone').value;
+
+        if (!phoneNumber) {
+            alert('전화번호를 입력해주세요.');
+            return;
+        }
+
+        const appVerifier = window.recaptchaVerifier;
+
+        // 전화번호 인증 발송
+        signInWithPhoneNumber(auth, '+82' + phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                window.confirmationResult = confirmationResult;
+                console.log(confirmationResult);
+
+                // 인증번호 입력 칸과 인증 확인 버튼을 표시
+                document.getElementById('phoneVerifySection').style.display = 'block';
+                document.getElementById('phoneVerifyCodeBtn').style.display = 'inline-block'; // 인증 확인 버튼을 보이게 설정
+
+                // 인증 확인 버튼 클릭 이벤트 추가
+                document.getElementById('phoneVerifyCodeBtn').addEventListener('click', () => {
+                    const code = document.getElementById('phoneVerificationCode').value;
+                    const phoneNumber = document.getElementById('phone').value;
+
+                    // 인증 코드 입력이 없을 경우
+                    if (!code) {
+                        $('#phoneVerifyResult').text('인증번호를 입력해주세요.').css('color', 'red');
+                        return;
+                    }
+
+                    confirmationResult.confirm(code)
+                        .then((result) => {
+                            const user = result.user;
+                            $('#phoneVerifyResult').text('전화번호 인증이 완료되었습니다.').css('color', 'green');
+
+                            // 전화번호 인증 여부를 hidden input에 설정
+                            $('#phoneVerified').val('true'); // 값만 true로 변경
+
+                            // 추가적인 동작을 여기에 추가
+                        })
+                        .catch((error) => {
+                            console.error('인증 실패:', error.message);
+                            $('#phoneVerifyResult').text('인증 실패! 다시 시도해주세요.').css('color', 'red');
+                            $('#phoneVerified').val('false'); // 인증 실패시 false로 설정
+                        });
+                });
+            })
+            .catch((error) => {
+                console.error('전화번호 인증 실패:', error.message, error.code);
+                alert('인증번호 발송에 실패했습니다.');
+            });
+    });
+
+</script>
+
+<!-- ✅ Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
