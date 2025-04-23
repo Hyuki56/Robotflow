@@ -10,7 +10,7 @@
   const fromEdit = sessionStorage.getItem("fromEdit");
   const redirectUrl = /*[[${redirectUrl}]]*/ '/';
 
-  if (window.opener) {
+  if (window.opener) { // 소셜 로그인
     if (fromEdit) {
       window.opener.location.reload();
     } else {
