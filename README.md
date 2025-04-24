@@ -26,20 +26,7 @@
 | :------: |  :------: |
 |  ![3](https://github.com/user-attachments/assets/9baaa170-c8d0-48f0-a8e7-62e532036a16) | ![4](https://github.com/user-attachments/assets/3b91da9e-dba0-4231-a497-8c2a06e6991b) |
 | ![5](https://github.com/user-attachments/assets/667fdf1d-e8c1-4897-90bb-9230f0b18148) | ![6](https://github.com/user-attachments/assets/8b49ddda-2862-4312-806f-5f70c94c755f)  |
-|  ![7](https://github.com/user-attachments/assets/54a97cd8-5ced-46da-8060-a2f56f2391eb) |  ![8](https://github.com/user-attachments/assets/0a3cc2ed-a9e3-49fa-ac10-d7340e7dabb1)  |
-|  ![9](https://github.com/user-attachments/assets/8ed8b86b-a338-4679-b737-fdfc750e8613)  |  ![10](https://github.com/user-attachments/assets/720a83de-f80e-40be-b07b-fae5d3ef87d6) |  
-| ![11](https://github.com/user-attachments/assets/ed3f5bcf-5dad-451e-bb03-30bf8fb2a9a9)  | ![12](https://github.com/user-attachments/assets/10ab09c7-3f68-4201-9423-a7c2f6c085fd)  |
-| ![13](https://github.com/user-attachments/assets/2a22b275-d582-426a-b4c7-86164df2e7d5) |  ![14](https://github.com/user-attachments/assets/d8fd937b-9c05-4998-91fc-8b421085aaf9)  |
-| ![15](https://github.com/user-attachments/assets/7affe66e-c745-40cb-9c37-085cccadee94) |  ![16](https://github.com/user-attachments/assets/f1fff94a-bc06-4c78-8327-19ee9b9950f6)  |
-| ![17](https://github.com/user-attachments/assets/7633c8d7-ab9c-4d04-bead-a204e5d9dab1) |  ![18](https://github.com/user-attachments/assets/9db48938-5159-4515-97d3-3068f278554a)  |
-| ![19](https://github.com/user-attachments/assets/4a7b8b5d-371c-4352-a711-b6831fccf741) |  ![20](https://github.com/user-attachments/assets/8653920b-4887-4f6a-a9c6-2200a4bcf29c)  |
-| ![21](https://github.com/user-attachments/assets/fc7d7cea-0f6b-47b0-a193-2643a177341c) |  ![22](https://github.com/user-attachments/assets/56ea88b5-2f4c-4680-afe3-7fe892f7e1ef)  |
-| ![23](https://github.com/user-attachments/assets/ff2c66c8-8acf-45e6-ba13-9eb45d573fb3)  | ![24](https://github.com/user-attachments/assets/735fd962-b526-48cd-bc3a-19e438253855)  |
-| ![25](https://github.com/user-attachments/assets/3c9ff154-3cf8-4b21-9e92-5fbbec0a4a72) | ![26](https://github.com/user-attachments/assets/ef70382b-f0be-4b27-a1c0-cc10519f88af)  |
-| ![27](https://github.com/user-attachments/assets/3aeba8b7-7730-46d7-aae2-fbeda645ab63) | ![28](https://github.com/user-attachments/assets/c1c9a536-378d-4a78-b5ce-da172c1c17d5)  |
-|  ![29](https://github.com/user-attachments/assets/7dd8d017-fd08-4821-b0d8-2b2043380a28)  | ![30](https://github.com/user-attachments/assets/623c154d-3db3-4731-94de-88edf41e8653)  |
-|  ![31](https://github.com/user-attachments/assets/807a9703-6487-4e5f-bdb9-80c5e29cc385)  |  ![32](https://github.com/user-attachments/assets/86e1af05-01e9-45a5-9a20-3345978047cd)  |
-|  ![33](https://github.com/user-attachments/assets/077c8adc-d27c-4217-8e3b-4080bb828939)  |  ![34](https://github.com/user-attachments/assets/41372c9d-9849-460a-84c3-20da5146c4c8)  |  ![35]((https://github.com/user-attachments/assets/30ec7e84-020f-4e22-baad-5a096fd5ee76))  |  ![36](https://github.com/user-attachments/assets/0605be47-465f-4970-b0aa-a04522beb376)  |  ![37](https://github.com/user-attachments/assets/5672da8f-f115-4c08-9c68-3fab55f08850)  |  ![38](https://github.com/user-attachments/assets/05a5accb-4c5b-460e-9208-97d601b16a3f)  |  ![39](https://github.com/user-attachments/assets/043561f6-26a1-46c8-9270-18ae16007a23)  |  ![40](https://github.com/user-attachments/assets/5984cfd5-75b4-453d-bf12-112b6bcb6695)  |  ![41](https://github.com/user-attachments/assets/57a94a26-297d-4e49-a81a-0195b506f07c)  |  ![42](https://github.com/user-attachments/assets/f8da4c13-8bc9-4f1e-bda9-2665f06f72a4)  |
+
 </div>            
 </details>            
       
@@ -57,8 +44,8 @@
 
 | **김원준** | **최 혁** | **박채은** |
 | :------: |  :------: | :------: |
-| (https://github.com/kWJ30) | (https://github.com/J0hyun) | (https://github.com/jungwoonAn) |
-| 로그인 API <br> 회원정보 등록/수정/탈퇴 <br> 상품 등록/수정/삭제 <br> 아이디/비밀번호찾기 <br> | 리뷰 등록/수정/삭제 <br> 실시간양방향 채팅 <br> (WebSocket, Stomp) |  프론트엔드 <br> 상품등록 카테고리 ajax <br> 페이징및검색 <br> 결제,주소API |
+| (https://github.com/kWJ30) | (https://github.com/Hyuki56) | (https://github.com/chae-eun-22) |
+| 로그인 API <br> 회원정보 등록/수정/탈퇴 <br> 아이디/비밀번호찾기 <br> 상품 등록/수정/삭제 <br> | 백엔드 |  프론트엔드  |
 </div>
 
 </div>
