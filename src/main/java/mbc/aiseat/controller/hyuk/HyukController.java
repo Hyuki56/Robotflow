@@ -29,7 +29,4 @@ public class HyukController {
         return "hyuk/classRoom/class" + num;
     }
 
-
-
-
 }
