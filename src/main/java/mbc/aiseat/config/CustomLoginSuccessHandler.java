@@ -30,7 +30,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         if (savedRequest != null) {
             String targetUrl = savedRequest.getRedirectUrl();
             // live 페이지 접근 요청이면, 권한에 따라 처리
-            if (targetUrl.contains("frontlive") || targetUrl.contains("backlive")) {
+            if (targetUrl.contains("frontlive") || targetUrl.contains("backlive") || targetUrl.contains("info")) {
                 if (isAdmin) {
                     if (authentication.getPrincipal() instanceof OAuth2User) {
                         // 소셜 로그인: 팝업 페이지로 이동
