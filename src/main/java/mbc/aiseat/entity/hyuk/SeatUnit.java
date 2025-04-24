@@ -50,7 +50,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class SeatUnit {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -64,6 +63,4 @@ public class SeatUnit {
     @ManyToOne
     @JoinColumn(name = "library_id")
     private Library library;
-
-
 }
