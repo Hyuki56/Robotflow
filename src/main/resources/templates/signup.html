@@ -160,10 +160,7 @@
         url: '/send-verification-code',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({
-          email: email,
-          purpose: 'register' // ✅ 회원가입 목적 명시
-        }),
+        data: JSON.stringify({email: email, purpose: 'register'}),
         success: function(response) {
           alert('인증번호가 이메일로 전송되었습니다.');
           $('#verifySection').show(); // 인증번호 입력창 표시
