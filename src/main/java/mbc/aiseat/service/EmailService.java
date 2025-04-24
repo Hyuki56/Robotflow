@@ -23,7 +23,7 @@ public class EmailService {
     }
 
     public boolean sendVerificationCode(String email, String purpose) {
-        if (!memberRepository.existsByEmail(email)) {
+        if (!memberRepository.existsByEmail(email) & purpose.equals("password")) {
             return false;
         }
 
