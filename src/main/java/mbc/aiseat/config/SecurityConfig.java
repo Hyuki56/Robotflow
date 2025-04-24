@@ -21,6 +21,8 @@ public class SecurityConfig {
 
     private final CustomLoginSuccessHandler customLoginSuccessHandler;
 
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.info("----------SecurityFilterChain 진입 체크----------");
@@ -43,7 +45,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)  // 이 줄 중요!
                         )
                         .successHandler(customLoginSuccessHandler) // 소셜도 동일 처리
-                        .failureUrl("/oauth-login-error.html") // 수정된 부분
+                        .failureHandler(customAuthenticationFailureHandler) // 수정된 부분
                 )
 
                 .logout(logout -> logout

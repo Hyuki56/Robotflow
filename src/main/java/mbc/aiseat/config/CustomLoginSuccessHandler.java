@@ -23,16 +23,14 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
 
         SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
-
         // 사용자 권한 목록 확인
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
         if (savedRequest != null) {
             String targetUrl = savedRequest.getRedirectUrl();
-
             // live 페이지 접근 요청이면, 권한에 따라 처리
-            if (targetUrl.contains("frontlive") || targetUrl.contains("backlive")) {
+            if (targetUrl.contains("frontlive") || targetUrl.contains("backlive") || targetUrl.contains("info")) {
                 if (isAdmin) {
                     if (authentication.getPrincipal() instanceof OAuth2User) {
                         // 소셜 로그인: 팝업 페이지로 이동
@@ -40,14 +38,14 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                         request.getSession().setAttribute("redirectAfterOAuth", redirectUrl);
                         response.sendRedirect("/oauth-success.html");
                     } else {
-                        // ✅ 일반 로그인: 요청한 원래 URL로 바로 redirect
+                        // 일반 로그인: 요청한 원래 URL로 바로 redirect
                         String redirectUrl = savedRequest.getRedirectUrl();
                         response.sendRedirect(redirectUrl);
                     }
                 } else {
                     response.sendRedirect("/error/403.html");
                 }
-            } else { // live 페이지 이외 url 직접입력에 대한 처리
+            } else {
                 if (authentication.getPrincipal() instanceof OAuth2User) {
                     // 소셜 로그인일 경우: 팝업 처리
                     request.getSession().setAttribute("redirectAfterOAuth", targetUrl);
@@ -58,7 +56,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                 }
             }
         }
-        else { // savedRequest 가 없는, 즉 홈페이지에서 로그인 링크를 눌러 들어온 경우
+        else {
             if (authentication.getPrincipal() instanceof OAuth2User){
                 response.sendRedirect("/oauth-success.html");
             }
@@ -69,4 +67,3 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
 }
-

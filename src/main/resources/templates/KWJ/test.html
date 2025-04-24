@@ -46,7 +46,7 @@
 <body>
 <h1>객체 정보 페이지</h1>
 <a href="/"> 홈페이지 </a>
-<a href="/info" sec:authorize="hasRole('ROLE_ADMIN')"> 예약정보 및 승인처리 </a>
+
 
 <!-- 예약 정보 표시 영역 -->
 <div id="reservation-info">
@@ -83,9 +83,9 @@
   const client = mqtt.connect('ws://localhost:9001');
   let Objects = null;
   let frontPrintDone = false; // 로그 첫 출력 여부
-  let backPrintDone = false; // 로그 첫 출력 여부
+  let backPrintDone = false; // false 로 해야 조건문에 의해 printobjects 로 객체탐지결과를 가지고옴
   let frontImageDisplayed = true;
-  let backImageDisplayed = false;
+  let backImageDisplayed = true;
 
   client.on("connect", () => {
     console.log("Connected");
@@ -538,7 +538,14 @@
                   const data = text ? JSON.parse(text) : null;
                   if (data) {
                     // 이미 예약된 좌석이 있는 경우
+
                     const currentSeatName = data.seatName; // 예약된 좌석 이름
+                    const approved = data.approved; // 승인 여부
+
+                    if (approved) {
+                      alert("승인된 좌석은 예약 변경이 불가능합니다.");
+                      return;
+                    }
                     const userMessage = `${username}님은 이미 ${currentSeatName} 좌석을 예약하셨습니다. 좌석을 변경하시겠습니까?`;
 
                     if (confirm(userMessage)) {
@@ -628,7 +635,8 @@
               if (data && data.seatName && data.updateTime) {
                 currentReservation = {
                   seatName: data.seatName,
-                  reservedBy: username
+                  reservedBy: username,
+                  approved: data.approved
                 };
 
                 const date = new Date(data.updateTime);
@@ -657,7 +665,12 @@
     cancelButton.addEventListener('click', () => {
       if (!currentReservation) return;
 
-      const { seatName, reservedBy } = currentReservation;
+      const { seatName, reservedBy, approved } = currentReservation;
+
+      if (approved) {
+        alert("승인된 좌석은 예약 취소가 불가능합니다.");
+        return;
+      }
 
       if (confirm(`정말 ${seatName} 좌석 예약을 취소하시겠습니까?`)) {
         fetch('/cancel-reservation', {
@@ -673,7 +686,8 @@
                     document.getElementById("reservation-time").textContent = "";
                     cancelButton.style.display = 'none';
                     currentReservation = null;
-                    setupSeats();
+                    // 화면이 제대로 갱신될 수 있도록 딜레이 추가
+                    setTimeout(() => setupSeats(), 500); // 0.5초 뒤에 setupSeats 실행
                   } else {
                     alert("예약 취소 실패: " + response.message);
                   }
@@ -685,6 +699,7 @@
       }
     });
   }
+
 
   document.addEventListener('DOMContentLoaded', function () {
     const username = /*[[${Email}]]*/ 'guest';

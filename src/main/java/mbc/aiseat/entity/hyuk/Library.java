@@ -10,7 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class Library {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
