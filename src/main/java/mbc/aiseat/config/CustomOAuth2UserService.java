@@ -97,14 +97,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             new OAuth2Error("linked_account_exists", "이미 다른 계정에 연동된 소셜 계정입니다.", null),
                             "이미 다른 계정에 연동된 소셜 계정입니다."
                     );
-
                 }
-
                 member.setProvider(registrationId);
                 member.setProviderId(providerId);
                 memberRepository.save(member);
             }
-
         } else {
             // 비로그인 상태에서 소셜 로그인 → providerId로 조회
             member = memberRepository.findByProviderId(providerId);
@@ -115,12 +112,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         new OAuth2Error("no_linked_account", "소셜 로그인 실패: 등록된 계정이 없습니다.", null),
                         "소셜 로그인 실패: 등록된 계정이 없습니다."
                 );
-
-
-
             }
         }
-
         return new CustomUserDetails(member, attributes);
     }
 

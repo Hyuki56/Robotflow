@@ -15,8 +15,8 @@
             height: 100%;
         }
         img#cameraView {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 50%;
+            max-height: 50%;
             bottom: 0;
             left: 0;
             right: 0;
@@ -42,12 +42,7 @@
     const client = mqtt.connect(broker);
 
     client.on("connect", () => {
-        console.log("Connected to broker");
-        client.subscribe(topic, (err) => {
-            if(!err) {
-                console.log(`Subscibed to topic: ${topic}`);
-            }
-        })
+        client.subscribe(topic);
     })
 
     client.on("message", (topic, message) => {
@@ -58,9 +53,6 @@
 
             const img = document.getElementById("cameraView")
             img.src = `data:image/jpg;base64,${base64Image}`;
-
-            // 객체 정보 출력 (예: 콘솔 or 아래에 표시)
-            console.log("Detected Objects:", detectedObjects);
 
         }catch(e) {
             console.error('Failed to parse message: ', e);
