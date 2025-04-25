@@ -14,13 +14,17 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="#">홈페이지</a>
 
-        <div class="collapse navbar-collapse w-100 justify-content-center" id="navbarMenu">
-            <div class="d-flex align-items-center gap-3" style="margin-right: 70px;">
-                <!-- 로그인된 사용자 환영 메시지 -->
-                <span class="navbar-text text-white"
-                      sec:authorize="isAuthenticated()"
-                      th:text="${#authentication.principal.name} + '님 환영합니다.'">
-                </span>
+
+        <!-- 이 부분이 화면 크기가 작아지면 햄버거 메뉴로 변합니다. -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarMenu">
+            <!-- 로그인된 사용자 환영 메시지 -->
+            <span class="navbar-text text-white me-3" sec:authorize="isAuthenticated()"
+                  th:text="${#authentication.principal.name} + '님 환영합니다.'"></span>
+
 
                 <!-- 로그인/회원가입 or 로그아웃/정보수정 -->
                 <ul class="navbar-nav flex-row">
