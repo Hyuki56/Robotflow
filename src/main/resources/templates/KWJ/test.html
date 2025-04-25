@@ -443,17 +443,14 @@
           } else {
             // 같은 우선순위면 confidence 비교
             mergedRow.push(
-                    frontSeat.confidence >= backSeat.confidence ? frontSeat : backSeat
-            );
+                    frontSeat.confidence >= backSeat.confidence ? frontSeat : backSeat);
           }
         } else {
           mergedRow.push(null);
         }
       }
-
       mergedSeatMap.push(mergedRow);
     }
-
     return mergedSeatMap;
   }
 
