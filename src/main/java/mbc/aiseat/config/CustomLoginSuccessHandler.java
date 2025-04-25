@@ -23,46 +23,35 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
 
         SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
-        log.info("Saved request: " + savedRequest);
-
         // 사용자 권한 목록 확인
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
         if (savedRequest != null) {
             String targetUrl = savedRequest.getRedirectUrl();
-            log.info("Redirecting to " + targetUrl);
-
             // live 페이지 접근 요청이면, 권한에 따라 처리
-            if (targetUrl.contains("frontlive") || targetUrl.contains("backlive")) {
+            if (targetUrl.contains("frontlive") || targetUrl.contains("backlive") || targetUrl.contains("info")) {
                 if (isAdmin) {
-                    log.info("authentication Principal " + authentication.getPrincipal().toString());
                     if (authentication.getPrincipal() instanceof OAuth2User) {
                         // 소셜 로그인: 팝업 페이지로 이동
                         String redirectUrl = savedRequest.getRedirectUrl();
-                        log.info("OAuth 로그인 요청한 원래 URL: " + redirectUrl);
                         request.getSession().setAttribute("redirectAfterOAuth", redirectUrl);
                         response.sendRedirect("/oauth-success.html");
                     } else {
-                        // ✅ 일반 로그인: 요청한 원래 URL로 바로 redirect
-                        log.info("Admin 권한 확인됨. 원래 요청 URL로 이동.");
+                        // 일반 로그인: 요청한 원래 URL로 바로 redirect
                         String redirectUrl = savedRequest.getRedirectUrl();
-                        log.info("일반 로그인 요청한 원래 URL: " + redirectUrl);
                         response.sendRedirect(redirectUrl);
                     }
                 } else {
-                    log.warn("Admin 권한 없음. 403 페이지로 리디렉션.");
                     response.sendRedirect("/error/403.html");
                 }
             } else {
                 if (authentication.getPrincipal() instanceof OAuth2User) {
                     // 소셜 로그인일 경우: 팝업 처리
-                    log.info("OAuth 로그인 (권한 없음 URL). 원래 URL: " + targetUrl);
                     request.getSession().setAttribute("redirectAfterOAuth", targetUrl);
                     response.sendRedirect("/oauth-success.html");
                 } else {
                     // 일반 로그인일 경우: 요청한 URL로 이동
-                    log.info("일반 로그인. 권한 체크 불필요. 원래 URL로 이동: " + targetUrl);
                     response.sendRedirect(targetUrl);
                 }
             }
@@ -78,4 +67,3 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
 }
-

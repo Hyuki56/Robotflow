@@ -17,9 +17,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SeatUnitRepository extends JpaRepository<SeatUnit, Long> {
-
     List<SeatUnit> findByLibraryId(Long libraryId);
-
     SeatUnit findByLibraryIdAndSeatNumber(Long libraryId, String seatNumber);
-
 }
